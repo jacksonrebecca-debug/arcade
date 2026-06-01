@@ -140,7 +140,7 @@
 
 <script>
 const $ = s => document.querySelector(s);
-let streak=0, twoP=false, score=[0,0], cur=0;            // cur = current player index (0/1)
+let streak=0, twoP=false, score=[0,0], cur=0, duel=[null,null];   // cur = current player index (0/1)
 const NAMES=['Player 1','Player 2'];                      // ← rename here if you like
 const rand = a => a[Math.floor(Math.random()*a.length)];
 const fmt = n => Math.round(n).toLocaleString('en-GB');
@@ -159,7 +159,7 @@ function countTo(el,target,ms=1100){
 }
 function toggleVs(){ twoP=!twoP; $('#vsToggle').classList.toggle('on',twoP); }
 function setStreak(win){ if(twoP)return; streak=win?streak+1:0; $('#streak').textContent=streak; }
-function home(){ cur=0; score=[0,0]; $('#game').classList.add('hidden'); $('#home').classList.remove('hidden');
+function home(){ cur=0; score=[0,0]; duel=[null,null]; $('#game').classList.add('hidden'); $('#home').classList.remove('hidden');
   $('#streakBox').style.visibility= twoP?'hidden':'visible'; }
 function start(m){ cur=0; score=[0,0]; $('#streakBox').style.visibility=twoP?'hidden':'visible';
   $('#home').classList.add('hidden'); $('#game').classList.remove('hidden'); window._mode=m; nextRound(); }
@@ -192,29 +192,48 @@ function fourExps(tExp){
 }
 function powLabel(e){const n=Math.pow(10,e);return friendly(n);}
 function sizeTag(e){return e<=3?'(tiny)':e<=5?'(smallish)':e<=7?'(big)':e<=9?'(HUGE)':'(absurd)';}
-function modeSize(){
-  const it=rand(sizeQs), tExp=Math.round(Math.log10(it.v)), opts=fourExps(tExp), cls=['c1','c2','c3','c4'];
+let sizeRound=null;
+function modeSize(){ cur=0; duel=[null,null];
+  const it=rand(sizeQs), tExp=Math.round(Math.log10(it.v)), opts=fourExps(tExp);
+  sizeRound={it,tExp,opts}; renderSize(); }
+function renderSize(){
+  const {it,opts}=sizeRound, cls=['c1','c2','c3','c4'];
   $('#stage').innerHTML=`${whoTag()}
     <div class="q">${it.q}</div>
     <div class="qsub">Don't work it out — just pick the right <b>size</b>.</div>
-    <div class="opts">${opts.map((e,i)=>`<button class="opt ${cls[i]}" onclick="sizeGuess(${e},${tExp},${it.v})">
+    <div class="opts">${opts.map((e,i)=>`<button class="opt ${cls[i]}" onclick="sizeGuess(${e})">
       ${powLabel(e)}<small>${sizeTag(e)}</small></button>`).join('')}</div>
     ${scoreboard()}<span class="backlink" onclick="home()">← back to games</span>`;
 }
-function sizeGuess(pick,truth,val){
-  const diff=Math.abs(pick-truth), win=diff===0, close=diff===1;
-  if(twoP){ if(win)score[cur]+=2; else if(close)score[cur]+=1;
-    if(cur===0){ cur=1; return modeSize(); } }
+function sizeGuess(pick){
+  const {it,tExp}=sizeRound, diff=Math.abs(pick-tExp), win=diff===0, close=diff===1;
+  if(twoP){
+    duel[cur]={pick,win,close}; if(win)score[cur]+=2; else if(close)score[cur]+=1;
+    if(cur===0){ cur=1; return renderSize(); }
+    return sizeDuel();
+  }
   setStreak(win);
   $('#stage').innerHTML=`<div class="reveal pop">
     <div class="verdict">${win?'🎉 Right ballpark!':close?'👀 One size off!':'😅 Way off — now you know!'}</div>
     <div class="bignum ${win?'win':''}" id="bn">0</div>
-    <div class="friendly">about <b>${friendly(val)}</b></div>
-    ${scoreboard()}
+    <div class="friendly">about <b>${friendly(it.v)}</b></div>
     <div class="explain"><b>Why it matters:</b> step one of any good guess is knowing whether a thing lives in the <i>hundreds</i>, the <i>thousands</i> or the <i>millions</i>. Get the size right and you're already most of the way home.</div>
-    <button class="btn teal" onclick="cur=0;modeSize()">Next question →</button>
+    <button class="btn teal" onclick="modeSize()">Next question →</button>
     <span class="backlink" onclick="home()">← back to games</span></div>`;
-  countTo($('#bn'),val);
+  countTo($('#bn'),it.v);
+}
+function sizeDuel(){
+  const {it,tExp}=sizeRound, d0=Math.abs(duel[0].pick-tExp), d1=Math.abs(duel[1].pick-tExp);
+  const w = d0<d1?0 : d1<d0?1 : -1, mark=r=>r.win?'🎯':r.close?'👀':'❌';
+  $('#stage').innerHTML=`<div class="reveal pop">
+    <div class="verdict">${w===-1?"It's a tie!":NAMES[w]+' wins the round! 🏆'}</div>
+    <div class="bignum" id="bn">0</div>
+    <div class="friendly">about <b>${friendly(it.v)}</b></div>
+    <div class="friendly" style="margin-top:8px"><b>${NAMES[0]}</b> picked ${powLabel(duel[0].pick)} ${mark(duel[0])} &nbsp;•&nbsp; <b>${NAMES[1]}</b> picked ${powLabel(duel[1].pick)} ${mark(duel[1])}</div>
+    ${scoreboard()}
+    <button class="btn teal" onclick="modeSize()">Next question →</button>
+    <span class="backlink" onclick="home()">← back to games</span></div>`;
+  countTo($('#bn'),it.v);
 }
 
 /* =================================================== MODE 2 : CHAIN REACTION */
@@ -253,11 +272,11 @@ const chainQs=[
           {t:"Tunings each piano needs a year",min:1,max:2,real:1},
           {t:"Pianos one tuner can do in a year",min:500,max:2000,real:1000,op:'÷'}]},
 ];
-let chainState=null;
-function modeChain(){ chainState={it:rand(chainQs),i:0,guesses:[]}; chainStep(); }
+let chainRound=null;
+function modeChain(){ cur=0; duel=[null,null]; chainRound={it:rand(chainQs), guesses:[]}; chainStep(); }
 function chainStep(){
-  const {it,i}=chainState;
-  if(i>=it.steps.length) return chainReveal();
+  const {it,guesses}=chainRound, i=guesses.length;
+  if(i>=it.steps.length) return chainTurnDone();
   const s=it.steps[i], fixed=s.min===s.max, init=fixed?s.real:Math.round((s.min+s.max)/2);
   $('#stage').innerHTML=`${whoTag()}
     <div class="qsub">${it.q}</div>
@@ -272,26 +291,41 @@ function chainStep(){
 }
 function combine(steps,vals){ let acc=vals[0];
   for(let i=1;i<vals.length;i++){ acc = steps[i].op==='÷' ? acc/vals[i] : acc*vals[i]; } return acc; }
-function chainNext(){ chainState.guesses.push(Number($('#sl').value)); chainState.i++; chainStep(); }
-function chainReveal(){
-  const {it,guesses}=chainState;
+function chainNext(){ chainRound.guesses.push(Number($('#sl').value)); chainStep(); }
+function chainTurnDone(){
+  const {it,guesses}=chainRound;
   const mine=combine(it.steps,guesses), real=combine(it.steps,it.steps.map(s=>s.real));
   const ratio=mine>real?mine/real:real/mine, win=ratio<=3, close=ratio<=10;
-  if(twoP){ score[cur]+= win?2:close?1:0;
-    if(cur===0){ cur=1; return modeChain(); } }
-  setStreak(win);
   const chain=guesses.map((g,i)=>(i?` <span class="x">${it.steps[i].op==='÷'?'÷':'×'}</span> `:'')+fmt(g)).join('');
+  if(twoP){
+    duel[cur]={mine,ratio,win,close}; score[cur]+= win?2:close?1:0;
+    if(cur===0){ cur=1; chainRound.guesses=[]; return chainStep(); }
+    return chainDuel(real);
+  }
+  setStreak(win);
   $('#stage').innerHTML=`<div class="reveal pop">
     <div class="verdict">${win?'🎉 Bang in the ballpark!':close?'👍 Close enough!':'😅 Miles off — fun though!'}</div>
     <div class="chainviz">${chain} <span class="x">=</span></div>
     <div class="bignum ${win?'win':''}" id="bn">0</div>
     <div class="friendly">your chain → <b>${friendly(mine)}</b> ${it.unit}</div>
-    ${scoreboard()}
     <div class="explain"><b>The real answer is about ${friendly(real)}.</b> ${it.afterNote||''}<br><br>
       <b>Why it matters:</b> nobody guesses a billion straight off. But anyone can guess a few small numbers — then just multiply (and sometimes divide). That's the entire trick to looking like a genius.</div>
-    <button class="btn teal" onclick="cur=0;modeChain()">Another →</button>
+    <button class="btn teal" onclick="modeChain()">Another →</button>
     <span class="backlink" onclick="home()">← back to games</span></div>`;
   countTo($('#bn'),mine);
+}
+function chainDuel(real){
+  const {it}=chainRound, w = duel[0].ratio<duel[1].ratio?0 : duel[1].ratio<duel[0].ratio?1 : -1;
+  const mark=r=>r.win?'🎯':r.close?'👍':'❌';
+  $('#stage').innerHTML=`<div class="reveal pop">
+    <div class="verdict">${w===-1?"It's a tie!":NAMES[w]+' wins the round! 🏆'}</div>
+    <div class="bignum win" id="bn">0</div>
+    <div class="friendly">real answer ≈ <b>${friendly(real)}</b> ${it.unit}</div>
+    <div class="friendly" style="margin-top:8px"><b>${NAMES[0]}</b> got ${friendly(duel[0].mine)} ${mark(duel[0])} &nbsp;•&nbsp; <b>${NAMES[1]}</b> got ${friendly(duel[1].mine)} ${mark(duel[1])}</div>
+    ${scoreboard()}
+    <button class="btn teal" onclick="modeChain()">Another →</button>
+    <span class="backlink" onclick="home()">← back to games</span></div>`;
+  countTo($('#bn'),real);
 }
 
 /* =================================================== MODE 3 : CALIBRATE */
@@ -315,11 +349,11 @@ const calibQs=[
   {q:"How many ants are alive on Earth right now?",v:20000000000000000,minE:13,maxE:19,
    clue:"Scientists reckon there are well over a million ants for every single human."},
 ];
-let calibState=null;
+let calibRound=null;
 const valFromS=(s,a,b)=>Math.pow(10,a+(s/1000)*(b-a));
-function modeCalib(){ calibState={it:rand(calibQs),firstWidth:null}; calibUI(false); }
+function modeCalib(){ cur=0; duel=[null,null]; calibRound={it:rand(calibQs),firstWidth:null}; calibUI(false); }
 function calibUI(withClue){
-  const it=calibState.it;
+  const it=calibRound.it;
   $('#stage').innerHTML=`${whoTag()}
     <div class="q">${it.q}</div>
     <div class="qsub">Drag the handles to a range you'd be <b>quite sure</b> holds the answer. Not too wide (boring), not too narrow (risky).</div>
@@ -336,18 +370,21 @@ function calibUI(withClue){
   calibUpdate();
 }
 function calibUpdate(){
-  const it=calibState.it; let lo=+$('#lo').value, hi=+$('#hi').value; if(lo>hi){[lo,hi]=[hi,lo];}
+  const it=calibRound.it; let lo=+$('#lo').value, hi=+$('#hi').value; if(lo>hi){[lo,hi]=[hi,lo];}
   $('#fill').style.left=(lo/10)+'%'; $('#fill').style.right=((1000-hi)/10)+'%';
   $('#lov').textContent=friendly(valFromS(lo,it.minE,it.maxE));
   $('#hiv').textContent=friendly(valFromS(hi,it.minE,it.maxE));
 }
-function curRange(){ const it=calibState.it; let lo=+$('#lo').value,hi=+$('#hi').value; if(lo>hi){[lo,hi]=[hi,lo];}
+function curRange(){ const it=calibRound.it; let lo=+$('#lo').value,hi=+$('#hi').value; if(lo>hi){[lo,hi]=[hi,lo];}
   return [valFromS(lo,it.minE,it.maxE),valFromS(hi,it.minE,it.maxE)]; }
-function calibClue(){ const [lo,hi]=curRange(); calibState.firstWidth=hi/lo; calibUI(true); }
+function calibClue(){ const [lo,hi]=curRange(); calibRound.firstWidth=hi/lo; calibUI(true); }
 function calibReveal(){
-  const it=calibState.it, [lo,hi]=curRange(), inside=it.v>=lo&&it.v<=hi, width=hi/lo, tighter=calibState.firstWidth/width;
-  if(twoP){ if(inside) score[cur]+= width<10?3:width<100?2:1;
-    if(cur===0){ cur=1; return modeCalib(); } }
+  const it=calibRound.it, [lo,hi]=curRange(), inside=it.v>=lo&&it.v<=hi, width=hi/lo, tighter=calibRound.firstWidth/width;
+  if(twoP){
+    duel[cur]={lo,hi,inside,width}; if(inside) score[cur]+= width<10?3:width<100?2:1;
+    if(cur===0){ cur=1; calibRound.firstWidth=null; return calibUI(false); }
+    return calibDuel();
+  }
   setStreak(inside);
   $('#stage').innerHTML=`<div class="reveal pop">
     <div class="verdict">${inside?'🎯 Reality landed in your range!':'😬 Reality slipped outside'}</div>
@@ -355,9 +392,25 @@ function calibReveal(){
     <div class="friendly">real answer ≈ <b>${friendly(it.v)}</b></div>
     <div class="friendly" style="margin-top:8px">your final range: ${friendly(lo)} → ${friendly(hi)}</div>
     ${tighter>1.3?`<div><span class="tighten">You tightened your range ${tighter.toFixed(1)}× after the clue 👏</span></div>`:''}
-    ${scoreboard()}
     <div class="explain"><b>Why it matters:</b> good thinking isn't one perfect number — it's an honest <i>range</i> that you <i>shrink</i> when new evidence shows up. That clue was new evidence. The aim: be right <i>most</i> of the time with ranges that are still nice and tight. ${inside?'You were honest AND sharp.':'Widen a touch next time — or you just got unlucky. Both allowed.'}</div>
-    <button class="btn peri" onclick="cur=0;modeCalib()">Another →</button>
+    <button class="btn peri" onclick="modeCalib()">Another →</button>
+    <span class="backlink" onclick="home()">← back to games</span></div>`;
+  countTo($('#bn'),it.v);
+}
+function calibDuel(){
+  const it=calibRound.it, a=duel[0], b=duel[1];
+  let w=-1;
+  if(a.inside&&b.inside) w = a.width<b.width?0 : b.width<a.width?1 : -1;
+  else if(a.inside) w=0; else if(b.inside) w=1;
+  const tag=r=>r.inside?'🎯 landed it':'❌ missed';
+  $('#stage').innerHTML=`<div class="reveal pop">
+    <div class="verdict">${w===-1?(a.inside||b.inside?"It's a tie!":'Nobody landed it! 😬'):NAMES[w]+' wins the round! 🏆'}</div>
+    <div class="bignum win" id="bn">0</div>
+    <div class="friendly">real answer ≈ <b>${friendly(it.v)}</b></div>
+    <div class="friendly" style="margin-top:8px"><b>${NAMES[0]}</b>: ${friendly(a.lo)} → ${friendly(a.hi)} ${tag(a)}<br><b>${NAMES[1]}</b>: ${friendly(b.lo)} → ${friendly(b.hi)} ${tag(b)}</div>
+    <div class="explain">Tightest <i>correct</i> range wins — being right matters, but so does daring to go narrow. That's calibration in a nutshell.</div>
+    ${scoreboard()}
+    <button class="btn peri" onclick="modeCalib()">Another →</button>
     <span class="backlink" onclick="home()">← back to games</span></div>`;
   countTo($('#bn'),it.v);
 }
