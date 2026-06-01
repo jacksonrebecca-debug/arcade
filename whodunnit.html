@@ -1,0 +1,197 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WHODUNNIT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDE7F6; --ink:#1a1626; --plum:#6C4BB6; --plum2:#4f3590; --sun:#FFC42E;
+    --coral:#FF5B4A; --teal:#1FB89B; --line:#1a1626; --shadow:6px 6px 0 var(--line);
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{background:var(--paper); color:var(--ink);
+    font-family:'Nunito',system-ui,'Trebuchet MS',sans-serif;}
+  body{min-height:100vh; padding:18px 16px 60px;
+    background-image:radial-gradient(var(--line) 1.2px, transparent 1.2px);
+    background-size:30px 30px;}
+  .wrap{max-width:680px; margin:0 auto}
+  h1,h2,h3{font-family:'Fredoka',system-ui,sans-serif}
+  header{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px}
+  .logo{font-weight:700; font-size:32px; letter-spacing:-1px; line-height:.9}
+  .logo small{display:block; font-size:11px; font-weight:600; letter-spacing:3px;
+    color:var(--plum2); text-transform:uppercase}
+  .badge{background:var(--sun); border:3px solid var(--line); border-radius:14px;
+    padding:8px 12px; box-shadow:3px 3px 0 var(--line); font-family:'Fredoka'; font-weight:600;
+    text-align:center; min-width:92px}
+  .badge b{display:block; font-size:22px; line-height:1}
+  .badge span{font-size:9px; letter-spacing:1px; text-transform:uppercase}
+  .card{background:#fff; border:3px solid var(--line); border-radius:18px;
+    box-shadow:var(--shadow); padding:16px; margin-bottom:14px}
+  .crime{font-family:'Fredoka'; font-weight:700; font-size:24px; line-height:1.1}
+  .crime-sub{font-size:13px; opacity:.65; font-weight:700; margin-top:4px}
+  .sus{display:flex; align-items:center; gap:12px; padding:10px 0; border-top:2px solid #0001}
+  .sus:first-child{border-top:none}
+  .sus.guilty{background:#FFEAE7; border-radius:12px; padding:10px 8px; margin:2px -4px}
+  .sus.cleared{opacity:.5}
+  .avatar{font-size:34px; line-height:1; width:42px; text-align:center}
+  .sinfo{flex:1; min-width:0}
+  .sname{font-family:'Fredoka'; font-weight:600; font-size:16px}
+  .chips{display:flex; flex-wrap:wrap; gap:4px; margin:3px 0}
+  .chip{font-size:11px; font-weight:700; background:#eee; border:2px solid var(--line);
+    border-radius:20px; padding:1px 7px}
+  .pbar{height:16px; border:2px solid var(--line); border-radius:10px; background:#f0ecf8; overflow:hidden; margin-top:4px}
+  .pfill{height:100%; width:25%; background:var(--plum); transition:width .7s cubic-bezier(.2,.8,.2,1)}
+  .pend{display:flex; flex-direction:column; align-items:center; gap:4px}
+  .pct{font-family:'Fredoka'; font-weight:700; font-size:17px; min-width:46px; text-align:center}
+  .btn{cursor:pointer; font-family:'Fredoka'; font-weight:600; font-size:16px; color:#fff;
+    background:var(--plum); border:3px solid var(--line); border-radius:13px; padding:10px 16px;
+    box-shadow:3px 3px 0 var(--line); transition:transform .08s; margin-top:10px}
+  .btn:hover{transform:translate(-2px,-2px); box-shadow:5px 5px 0 var(--line)}
+  .btn:active{transform:translate(2px,2px); box-shadow:1px 1px 0 var(--line)}
+  .btn[disabled]{opacity:.4; cursor:not-allowed; transform:none; box-shadow:3px 3px 0 var(--line)}
+  .btn.full{width:100%}
+  .btn.coral{background:var(--coral)} .btn.teal{background:var(--teal)} .btn.ghost{background:#fff; color:var(--ink)}
+  .btn.tiny{font-size:13px; padding:6px 11px; margin:0}
+  .clue{background:var(--sun); border:3px solid var(--line); border-radius:13px; padding:11px 13px;
+    font-weight:700; font-size:14px; margin-bottom:8px; display:flex; gap:8px; align-items:flex-start}
+  .clue .ic{font-size:20px}
+  .clue .why{display:block; font-weight:700; font-size:12px; opacity:.7; margin-top:3px}
+  .hint{font-size:13px; line-height:1.45; opacity:.8; margin-bottom:12px}
+  .verdict{font-family:'Fredoka'; font-weight:700; font-size:24px; text-align:center; margin-bottom:6px}
+  .stars{text-align:center; font-size:28px; margin:4px 0}
+  .note{background:#fff; border:3px solid var(--line); border-radius:13px; padding:12px; font-size:13px; line-height:1.45; font-weight:700; margin-top:10px}
+  .center{text-align:center}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="logo">WHODUNNIT<small>follow the clues · trust the bars</small></div>
+    <div class="badge"><b id="cracked">0</b><span>🕵️ cracked</span></div>
+  </header>
+  <div id="panel"></div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const rand = a => a[Math.floor(Math.random()*a.length)];
+function shuffle(a){ a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+const FEATURES=[
+  {k:'hat',  text:'wore a hat',           icon:'🎩', chip:'🎩 hat'},
+  {k:'specs',text:'had glasses',          icon:'👓', chip:'👓 specs'},
+  {k:'tall', text:'was very tall',        icon:'📏', chip:'📏 tall'},
+  {k:'bag',  text:'carried a backpack',   icon:'🎒', chip:'🎒 bag'},
+  {k:'mud',  text:'had muddy shoes',      icon:'👟', chip:'👟 muddy'},
+  {k:'red',  text:'wore something red',   icon:'🟥', chip:'🟥 red'},
+  {k:'dog',  text:'had a dog with them',  icon:'🐶', chip:'🐶 dog'},
+  {k:'tash', text:'had a moustache',      icon:'🥸', chip:'🥸 \u2019tache'},
+];
+const POOL=[
+  {name:'Bonnie the Baker',avatar:'👩‍🍳'},{name:'Sir Reginald',avatar:'🧐'},
+  {name:'Captain Pip',avatar:'🧑‍✈️'},{name:'Mucky Mo',avatar:'🧑‍🌾'},
+  {name:'Granny Spark',avatar:'👵'},{name:'Dodgy Dave',avatar:'🕵️'},
+  {name:'Twitchy Tess',avatar:'🙆‍♀️'},{name:'Wizard Win',avatar:'🧙'},
+  {name:'Coach Carl',avatar:'🧑‍🏫'},{name:'Bouncy Bea',avatar:'🤸‍♀️'},
+];
+const CRIMES=[
+  'The Case of the Missing Biscuits 🍪','Who Let the Class Hamster Out? 🐹',
+  'The Mystery of the Muddy Footprints 👣','Who Ate the Last Slice of Cake? 🍰',
+  'The Great Pencil-Case Heist ✏️','Who Hid the TV Remote? 📺',
+  'The Case of the Deflated Football ⚽','Who Nicked the Last Crisp? 🥔',
+];
+
+function probsFor(cast,clues,n){
+  let w=cast.map(()=>1);
+  for(let i=0;i<n;i++){ const c=clues[i];
+    cast.forEach((s,j)=>{ w[j]*= s.feats.has(c.k)? c.r : (1-c.r); }); }
+  const sum=w.reduce((a,b)=>a+b,0)||1; return w.map(x=>x/sum);
+}
+function makeCase(){
+  for(let t=0;t<300;t++){
+    const cast=shuffle(POOL).slice(0,4).map(c=>({name:c.name,avatar:c.avatar,feats:new Set()}));
+    cast.forEach(s=>FEATURES.forEach(f=>{ if(Math.random()<0.5) s.feats.add(f.k); }));
+    const ci=Math.floor(Math.random()*4), cul=cast[ci];
+    const culFeats=FEATURES.filter(f=>cul.feats.has(f.k));
+    if(culFeats.length<4) continue;
+    let rivals=cast.filter((s,i)=>i!==ci);
+    const picked=[]; const avail=[...culFeats];
+    while(avail.length && picked.length<4 && rivals.length){
+      avail.sort((a,b)=> rivals.filter(r=>r.feats.has(a.k)).length - rivals.filter(r=>r.feats.has(b.k)).length);
+      const f=avail.shift(); picked.push(f);
+      rivals=rivals.filter(r=>r.feats.has(f.k));
+    }
+    if(rivals.length || picked.length<3) continue;
+    const clues=picked.map(f=>({k:f.k,text:f.text,icon:f.icon, r:[0.65,0.7,0.75,0.8,0.85][Math.floor(Math.random()*5)]}));
+    const p=probsFor(cast,clues,clues.length);
+    let mi=0; p.forEach((x,i)=>{ if(x>p[mi]) mi=i; });
+    if(mi!==ci || p[ci]<0.4) continue;
+    return {crime:rand(CRIMES),cast,ci,clues,revealed:0,done:false,accused:null};
+  }
+  return makeCase();
+}
+
+let C=null, cracked=0;
+try{ cracked=parseInt(localStorage.getItem('whodunnit_cracked'))||0; }catch(e){}
+function saveCracked(){ try{ localStorage.setItem('whodunnit_cracked',cracked); }catch(e){} $('#cracked').textContent=cracked; }
+
+function newCase(){ C=makeCase(); renderShell(); update(); }
+function renderShell(){
+  const suspects=C.cast.map((s,i)=>`
+    <div class="sus" id="sus${i}">
+      <div class="avatar">${s.avatar}</div>
+      <div class="sinfo">
+        <div class="sname">${s.name}</div>
+        <div class="chips">${FEATURES.filter(f=>s.feats.has(f.k)).map(f=>`<span class="chip">${f.chip}</span>`).join('')||'<span class="chip">no clues spotted</span>'}</div>
+        <div class="pbar"><div class="pfill" id="pf${i}"></div></div>
+      </div>
+      <div class="pend"><div class="pct" id="pc${i}">25%</div>
+        <button class="btn coral tiny" onclick="accuse(${i})">Accuse</button></div>
+    </div>`).join('');
+  $('#panel').innerHTML=`
+    <div class="card"><div class="crime">${C.crime}</div>
+      <div class="crime-sub">4 suspects · 1 culprit · ${C.clues.length} clues available</div></div>
+    <div class="card">
+      <div class="hint">Everyone starts equally likely. Each clue is a witness who's only <b>partly</b> sure — so the bars <i>shift</i>, they don't rule people out. Watch who climbs.</div>
+      <div id="suspects">${suspects}</div>
+    </div>
+    <div class="card">
+      <div id="clues"></div>
+      <button class="btn full" id="revealBtn" onclick="reveal()">🔍 Reveal a clue</button>
+    </div>
+    <div id="result"></div>`;
+}
+function update(){
+  const p=probsFor(C.cast,C.clues,C.revealed);
+  p.forEach((x,i)=>{ const pf=$('#pf'+i); if(pf) pf.style.width=(x*100)+'%';
+    const pc=$('#pc'+i); if(pc) pc.textContent=Math.round(x*100)+'%'; });
+  const cl=$('#clues');
+  cl.innerHTML = C.revealed===0 ? '<div class="hint" style="margin:0">No clues yet — reveal the first one!</div>'
+    : C.clues.slice(0,C.revealed).map(c=>`<div class="clue"><span class="ic">${c.icon}</span>
+        <div>A witness is <b>${Math.round(c.r*100)}%</b> sure the culprit ${c.text}.
+        <span class="why">→ suspects who ${c.text} get more likely; the rest less likely.</span></div></div>`).join('');
+  const rb=$('#revealBtn');
+  if(C.revealed>=C.clues.length){ rb.disabled=true; rb.textContent='All clues revealed — make your accusation!'; }
+  else rb.textContent=`🔍 Reveal a clue  (${C.clues.length-C.revealed} left)`;
+}
+function reveal(){ if(C.done||C.revealed>=C.clues.length) return; C.revealed++; update(); }
+function accuse(i){
+  if(C.done) return; C.done=true;
+  const right=(i===C.ci), used=C.revealed;
+  C.cast.forEach((s,j)=>{ const el=$('#sus'+j); if(!el) return;
+    if(j===C.ci) el.classList.add('guilty'); else if(j===i&&!right) el.classList.add('cleared'); });
+  $('#revealBtn').disabled=true;
+  let stars='', head='';
+  if(right){ cracked++; saveCracked();
+    stars = used<=2?'🌟🌟🌟':used===3?'🌟🌟':'🌟';
+    head = used<=2?'Cracked it — genius detective!':used===3?'Solved it!':'Got there in the end!';
+  } else { head='Wrong suspect! The real culprit was '+C.cast[C.ci].name+'.'; }
+  $('#result').innerHTML=`<div class="card center">
+    <div class="verdict">${right?'🎉 '+head:'🚨 '+head}</div>
+    ${right?`<div class="stars">${stars}</div><div style="font-weight:700">You accused ${C.cast[i].name} after ${used} clue${used===1?'':'s'}.</div>`
+           :`<div style="font-weight:700">You accused ${C.cast[i].name}. Have another look at their clues!</div>`}
+    <div class="note">Detectives don't <i>prove</i> things one clue at a time — each clue just nudges how sure you are, up or down. Stack enough nudges and one suspect pulls clear. That's exactly how good thinking works: update as the evidence comes in.</div>
+    <button class="btn teal full" onclick="newCase()">New case →</button>
+  </div>`;
+}
+saveCracked(); newCase();
+</script>
