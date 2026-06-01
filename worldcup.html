@@ -1,0 +1,301 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CUP CALLER</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EAF7EE; --ink:#13231a; --grass:#1B8A57; --grass2:#0f6b42; --sun:#FFC42E;
+    --coral:#FF5B4A; --peri:#6C7CFF; --line:#13231a; --shadow:6px 6px 0 var(--line);
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{background:var(--paper); color:var(--ink);
+    font-family:'Nunito',system-ui,'Trebuchet MS',sans-serif;}
+  body{min-height:100vh; padding:18px 16px 60px;
+    background-image:linear-gradient(transparent 95%,rgba(0,0,0,.05) 95%),linear-gradient(90deg,transparent 95%,rgba(0,0,0,.05) 95%);
+    background-size:42px 42px;}
+  .wrap{max-width:680px; margin:0 auto}
+  h1,h2,h3,.disp{font-family:'Fredoka',system-ui,sans-serif}
+  header{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px}
+  .logo{font-weight:700; font-size:32px; letter-spacing:-1px; line-height:.9}
+  .logo small{display:block; font-size:11px; font-weight:600; letter-spacing:3px;
+    color:var(--grass2); text-transform:uppercase}
+  .badge{background:var(--sun); border:3px solid var(--line); border-radius:14px;
+    padding:8px 12px; box-shadow:3px 3px 0 var(--line); font-family:'Fredoka'; font-weight:600;
+    text-align:center; min-width:92px}
+  .badge b{display:block; font-size:22px; line-height:1}
+  .badge span{font-size:9px; letter-spacing:1px; text-transform:uppercase}
+  .tabs{display:flex; gap:8px; margin-bottom:16px}
+  .tab{flex:1; cursor:pointer; font-family:'Fredoka'; font-weight:600; font-size:15px;
+    border:3px solid var(--line); border-radius:14px; padding:10px 6px; background:#fff;
+    box-shadow:3px 3px 0 var(--line); text-align:center}
+  .tab.on{background:var(--grass); color:#fff}
+  .card{background:#fff; border:3px solid var(--line); border-radius:18px;
+    box-shadow:var(--shadow); padding:16px; margin-bottom:14px}
+  .intro{font-size:14px; line-height:1.5; margin-bottom:14px}
+  .match-teams{font-family:'Fredoka'; font-weight:600; font-size:19px; line-height:1.2}
+  .match-when{font-size:12px; opacity:.6; font-weight:700; margin-top:2px; text-transform:uppercase; letter-spacing:.5px}
+  .btn{cursor:pointer; font-family:'Fredoka'; font-weight:600; font-size:16px; color:#fff;
+    background:var(--grass); border:3px solid var(--line); border-radius:13px; padding:10px 16px;
+    box-shadow:3px 3px 0 var(--line); transition:transform .08s; margin-top:10px}
+  .btn:hover{transform:translate(-2px,-2px); box-shadow:5px 5px 0 var(--line)}
+  .btn:active{transform:translate(2px,2px); box-shadow:1px 1px 0 var(--line)}
+  .btn.full{width:100%}
+  .btn.coral{background:var(--coral)} .btn.peri{background:var(--peri)} .btn.ghost{background:#fff; color:var(--ink)}
+  .btn.sm{font-size:14px; padding:7px 12px}
+  .btn[disabled]{opacity:.4; cursor:not-allowed; transform:none; box-shadow:3px 3px 0 var(--line)}
+  .starrow{display:flex; align-items:center; gap:10px; margin:10px 0}
+  .starrow .lbl{flex:1; font-weight:700; font-size:15px}
+  .starrow .lbl small{display:block; font-weight:700; font-size:12px; opacity:.55}
+  .stepper{display:flex; align-items:center; gap:8px}
+  .stepper button{width:34px; height:34px; border:3px solid var(--line); border-radius:10px;
+    background:var(--sun); font-family:'Fredoka'; font-weight:700; font-size:20px; cursor:pointer; line-height:1;
+    box-shadow:2px 2px 0 var(--line)}
+  .stepper button:active{transform:translate(1px,1px); box-shadow:1px 1px 0 var(--line)}
+  .stepper .val{font-family:'Fredoka'; font-weight:700; font-size:20px; min-width:54px; text-align:center}
+  .stepper .val small{font-size:11px; opacity:.55; display:block; font-family:'Nunito'}
+  .left{font-family:'Fredoka'; font-weight:600; text-align:center; margin:6px 0; font-size:15px}
+  .left b{color:var(--coral)}
+  .pred-line{font-size:13px; font-weight:700; margin-top:6px; opacity:.8}
+  .resbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+  .resbtns .btn{flex:1; margin-top:0; min-width:90px}
+  .scorepill{display:inline-block; font-family:'Fredoka'; font-weight:700; font-size:15px;
+    border:3px solid var(--line); border-radius:12px; padding:5px 12px; margin-top:8px; box-shadow:2px 2px 0 var(--line)}
+  .scorepill.good{background:var(--grass); color:#fff} .scorepill.mid{background:var(--sun)} .scorepill.bad{background:var(--coral); color:#fff}
+  .tag{display:inline-block; font-size:12px; font-weight:900; padding:2px 8px; border-radius:20px; border:2px solid var(--line); margin-left:6px}
+  .tag.win{background:var(--grass); color:#fff} .tag.lose{background:#f0d0cc}
+  select{font-family:'Nunito'; font-weight:700; font-size:15px; padding:8px; border:3px solid var(--line);
+    border-radius:10px; background:#fff; width:100%; margin:4px 0}
+  .grid2{display:grid; grid-template-columns:1fr auto 1fr; gap:8px; align-items:center}
+  .vs{font-family:'Fredoka'; font-weight:700; opacity:.5}
+  .pick-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:10px 0}
+  .pick{cursor:pointer; font-family:'Fredoka'; font-weight:600; font-size:15px; border:3px solid var(--line);
+    border-radius:12px; padding:10px 8px; background:#fff; box-shadow:2px 2px 0 var(--line); text-align:left}
+  .pick.on{background:var(--grass); color:#fff}
+  .rec-big{font-family:'Fredoka'; font-weight:700; font-size:46px; line-height:1; color:var(--grass); text-align:center}
+  .rec-stats{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0}
+  .stat{border:3px solid var(--line); border-radius:13px; padding:10px; text-align:center; box-shadow:2px 2px 0 var(--line)}
+  .stat b{display:block; font-family:'Fredoka'; font-size:24px; line-height:1}
+  .stat span{font-size:11px; font-weight:700; opacity:.6; text-transform:uppercase; letter-spacing:.5px}
+  .note{background:var(--sun); border:3px solid var(--line); border-radius:13px; padding:12px; font-size:13px; line-height:1.45; font-weight:700}
+  .empty{text-align:center; opacity:.6; font-weight:700; padding:18px}
+  .hidden{display:none}
+  .small{font-size:12px; opacity:.6}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="logo">CUP CALLER<small>world cup 2026 · be the oracle</small></div>
+    <div class="badge"><b id="avg">–</b><span>⚽ skill</span></div>
+  </header>
+
+  <div class="tabs">
+    <div class="tab on" id="t-matches" onclick="showTab('matches')">Matches</div>
+    <div class="tab" id="t-winner" onclick="showTab('winner')">Winner</div>
+    <div class="tab" id="t-record" onclick="showTab('record')">My Record</div>
+  </div>
+
+  <div id="panel"></div>
+</div>
+
+<script>
+/* ---------- data ---------- */
+const GROUPS={
+  A:["Mexico","South Africa","South Korea","Czechia"],
+  B:["Canada","Bosnia & Herzegovina","Qatar","Switzerland"],
+  C:["Brazil","Morocco","Haiti","Scotland"],
+  D:["United States","Paraguay","Australia","Türkiye"],
+  E:["Germany","Curaçao","Ivory Coast","Ecuador"],
+  F:["Netherlands","Japan","Sweden","Tunisia"],
+  G:["Belgium","Egypt","Iran","New Zealand"],
+  H:["Spain","Cape Verde","Saudi Arabia","Uruguay"],
+  I:["France","Senegal","Iraq","Norway"],
+  J:["Argentina","Algeria","Austria","Jordan"],
+  K:["Portugal","Congo DR","Uzbekistan","Colombia"],
+  L:["England","Croatia","Ghana","Panama"]
+};
+const ALL_TEAMS=[].concat(...Object.values(GROUPS)).sort();
+const CONTENDERS=["Spain","Argentina","France","England","Brazil","Portugal","Germany","Netherlands","Belgium","Uruguay"];
+const SEED=[
+  {id:"s1",a:"Mexico",b:"South Africa",when:"11 Jun · opening match"},
+  {id:"s2",a:"South Korea",b:"Czechia",when:"11 Jun"},
+  {id:"s3",a:"United States",b:"Paraguay",when:"12 Jun"},
+  {id:"s4",a:"Canada",b:"Bosnia & Herzegovina",when:"12 Jun"},
+  {id:"s5",a:"England",b:"Croatia",when:"Group L"},
+  {id:"s6",a:"England",b:"Ghana",when:"Group L"},
+  {id:"s7",a:"England",b:"Panama",when:"Group L"}
+];
+
+/* ---------- state + storage ---------- */
+const KEY="cupcaller_v1";
+let S={fixtures:[],winner:null,dark:null};
+function load(){
+  try{ const raw=localStorage.getItem(KEY); if(raw){ S=JSON.parse(raw); return; } }catch(e){}
+  S={fixtures:SEED.map(f=>({...f,stars:null,result:null,score:null})),winner:null,dark:null};
+}
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
+
+/* ---------- scoring ---------- */
+// stars = [A,Draw,B] each 0..10 summing to 10  → probability vector /10
+// result = 'A' | 'D' | 'B'
+function brierScore(stars,result){
+  const p=[stars[0]/10,stars[1]/10,stars[2]/10];
+  const o=[result==='A'?1:0, result==='D'?1:0, result==='B'?1:0];
+  let bs=0; for(let i=0;i<3;i++) bs+=(p[i]-o[i])**2;     // 0 (perfect) .. 2 (worst)
+  return Math.round((1-bs/2)*100);                        // 100 best .. 0 worst
+}
+function mostLikely(stars){ const m=Math.max(...stars); return stars[0]===m?'A':stars[1]===m?'D':'B'; }
+function resolved(){ return S.fixtures.filter(f=>f.score!==null); }
+function avgScore(){ const r=resolved(); if(!r.length) return null; return Math.round(r.reduce((s,f)=>s+f.score,0)/r.length); }
+
+/* ---------- view plumbing ---------- */
+let tab="matches", editId=null, tmp=[0,0,0], resultId=null;
+function showTab(t){ tab=t; editId=null; resultId=null;
+  ["matches","winner","record"].forEach(x=>document.getElementById("t-"+x).classList.toggle("on",x===t));
+  render();
+}
+function refreshBadge(){ const a=avgScore(); document.getElementById("avg").textContent = a===null?"–":a; }
+function render(){ refreshBadge();
+  if(tab==="matches") renderMatches();
+  else if(tab==="winner") renderWinner();
+  else renderRecord();
+}
+
+/* ---------- MATCHES ---------- */
+function renderMatches(){
+  let html=`<div class="card"><div class="intro">Spread <b>10 stars</b> across the three results of a match — that's you saying how likely each one is. Lock it in, and once the match is played, tap what really happened to get your forecast score.</div></div>`;
+  S.fixtures.forEach(f=>{ html+=matchCard(f); });
+  html+=`<div class="card"><button class="btn full ghost" onclick="openAdd()">➕ Add a match to predict</button>
+    <div id="addbox"></div></div>`;
+  document.getElementById("panel").innerHTML=html;
+}
+function matchCard(f){
+  const head=`<div class="match-teams">${f.a} <span class="vs">v</span> ${f.b}</div><div class="match-when">${f.when||""}</div>`;
+  if(editId===f.id){
+    const left=10-(tmp[0]+tmp[1]+tmp[2]);
+    const row=(i,label,sub)=>`<div class="starrow">
+      <div class="lbl">${label}<small>${sub}</small></div>
+      <div class="stepper">
+        <button onclick="bump('${f.id}',${i},-1)">−</button>
+        <div class="val">${'⭐'.repeat(tmp[i])||'·'}<small>${tmp[i]*10}%</small></div>
+        <button onclick="bump('${f.id}',${i},1)">+</button>
+      </div></div>`;
+    return `<div class="card">${head}
+      ${row(0,f.a+' win','')}
+      ${row(1,'Draw','')}
+      ${row(2,f.b+' win','')}
+      <div class="left">Stars left: <b>${left}</b></div>
+      <button class="btn full" onclick="lockPred('${f.id}')" ${left!==0?'disabled':''}>${left!==0?'Use all 10 stars':'🔒 Lock my prediction'}</button>
+    </div>`;
+  }
+  if(f.score===null && f.stars){
+    // predicted, awaiting result
+    const s=f.stars;
+    return `<div class="card">${head}
+      <div class="pred-line">Your call: ${f.a} ${s[0]*10}% · Draw ${s[1]*10}% · ${f.b} ${s[2]*10}%</div>
+      ${resultId===f.id? resultButtons(f) :
+        `<button class="btn coral sm" onclick="openResult('${f.id}')">Enter the result</button>
+         <button class="btn ghost sm" onclick="reEdit('${f.id}')">Change pick</button>`}
+    </div>`;
+  }
+  if(f.score!==null){
+    const s=f.stars, won=mostLikely(s)===f.result;
+    const cls=f.score>=80?'good':f.score>=50?'mid':'bad';
+    const rtxt=f.result==='A'?f.a+' won':f.result==='D'?'It was a draw':f.b+' won';
+    return `<div class="card">${head}
+      <div class="pred-line">You said: ${f.a} ${s[0]*10}% · Draw ${s[1]*10}% · ${f.b} ${s[2]*10}% &nbsp;→&nbsp; <b>${rtxt}</b>
+        <span class="tag ${won?'win':'lose'}">${won?'top pick right':'top pick wrong'}</span></div>
+      <span class="scorepill ${cls}">Forecast score: ${f.score}/100</span>
+    </div>`;
+  }
+  // unpredicted
+  return `<div class="card">${head}
+    <button class="btn" onclick="startPred('${f.id}')">Predict this match</button></div>`;
+}
+function resultButtons(f){
+  return `<div class="small" style="margin-top:8px;font-weight:700">What actually happened?</div>
+    <div class="resbtns">
+      <button class="btn sm" onclick="setResult('${f.id}','A')">${f.a} won</button>
+      <button class="btn sm peri" onclick="setResult('${f.id}','D')">Draw</button>
+      <button class="btn sm" onclick="setResult('${f.id}','B')">${f.b} won</button>
+    </div>`;
+}
+function startPred(id){ editId=id; tmp=[0,0,0]; resultId=null; render(); }
+function reEdit(id){ const f=S.fixtures.find(x=>x.id===id); editId=id; tmp=f.stars?[...f.stars]:[0,0,0]; render(); }
+function bump(id,i,d){ const n=tmp[i]+d; const total=tmp[0]+tmp[1]+tmp[2];
+  if(d>0 && total>=10) return; if(n<0) return; tmp[i]=n; render(); }
+function lockPred(id){ const f=S.fixtures.find(x=>x.id===id);
+  if(tmp[0]+tmp[1]+tmp[2]!==10) return; f.stars=[...tmp]; editId=null; save(); render(); }
+function openResult(id){ resultId=id; render(); }
+function setResult(id,outcome){ const f=S.fixtures.find(x=>x.id===id);
+  f.result=outcome; f.score=brierScore(f.stars,outcome); resultId=null; save(); render(); }
+
+let adding=false;
+function openAdd(){ adding=!adding;
+  const box=document.getElementById("addbox");
+  if(!adding){ box.innerHTML=""; return; }
+  const opts=ALL_TEAMS.map(t=>`<option value="${t}">${t}</option>`).join('');
+  box.innerHTML=`<div style="margin-top:12px">
+    <div class="grid2">
+      <select id="ta">${opts}</select><span class="vs">v</span><select id="tb">${opts}</select>
+    </div>
+    <input id="tw" placeholder="When? (e.g. 18 Jun, or Quarter-final)" style="width:100%;font-family:'Nunito';font-weight:700;font-size:15px;padding:8px;border:3px solid var(--line);border-radius:10px;margin:6px 0">
+    <button class="btn full" onclick="addMatch()">Add it</button>
+  </div>`;
+  document.getElementById("tb").selectedIndex=1;
+}
+function addMatch(){ const a=document.getElementById("ta").value, b=document.getElementById("tb").value, w=document.getElementById("tw").value.trim();
+  if(a===b){ alert("Pick two different teams!"); return; }
+  S.fixtures.push({id:"u"+Date.now(),a,b,when:w||"your match",stars:null,result:null,score:null});
+  adding=false; save(); render();
+}
+
+/* ---------- WINNER ---------- */
+function renderWinner(){
+  const opts=["—"].concat(ALL_TEAMS).map(t=>`<option ${t===S.dark?'selected':''} value="${t}">${t}</option>`).join('');
+  const picks=CONTENDERS.map(t=>`<div class="pick ${S.winner===t?'on':''}" onclick="pickWinner('${t}')">${t}</div>`).join('')
+    +`<div class="pick ${S.winner==='__other'?'on':''}" onclick="pickWinner('__other')">Someone else 🐎</div>`;
+  document.getElementById("panel").innerHTML=`
+    <div class="card"><div class="intro">Who lifts the trophy on <b>19 July</b>? Pick your champion. The favourites are at the top — but the brave call is the one that makes you a legend if it lands.</div>
+      <div class="pick-grid">${picks}</div>
+      <div style="margin-top:6px;font-weight:700">Your cheeky dark-horse pick:</div>
+      <select onchange="S.dark=this.value==='—'?null:this.value; save(); refreshBadge();">${opts}</select>
+    </div>
+    ${S.winner?`<div class="card"><div class="match-teams">🏆 Your call: ${S.winner==='__other'?'an outsider':S.winner}</div>
+      ${S.dark?`<div class="pred-line">Dark horse: ${S.dark}</div>`:''}
+      <div class="small" style="margin-top:8px">Locked in. Come back after the final to see if you called it.</div></div>`:''}`;
+}
+function pickWinner(t){ S.winner = (S.winner===t?null:t); save(); renderWinner(); }
+
+/* ---------- RECORD ---------- */
+function renderRecord(){
+  const r=resolved(), avg=avgScore();
+  const correct=r.filter(f=>mostLikely(f.stars)===f.result).length;
+  const best=r.length?Math.max(...r.map(f=>f.score)):0;
+  const predicted=S.fixtures.filter(f=>f.stars).length;
+  let html=`<div class="card"><div class="rec-big">${avg===null?'—':avg}<span style="font-size:18px">/100</span></div>
+    <div class="small" style="text-align:center;font-weight:700">average forecast score</div>
+    <div class="rec-stats">
+      <div class="stat"><b>${predicted}</b><span>predicted</span></div>
+      <div class="stat"><b>${r.length}</b><span>results in</span></div>
+      <div class="stat"><b>${r.length?correct+'/'+r.length:'–'}</b><span>top pick right</span></div>
+      <div class="stat"><b>${r.length?best:'–'}</b><span>best score</span></div>
+    </div>
+    <div class="note">A high score isn't just picking winners — it's being <i>honest about how sure you are</i>. Put all 10 stars on one team and you win big if you're right, but crash if you're wrong. Spread them when you're unsure. A great forecaster is right <b>most</b> of the time without ever being silly-confident.</div>
+  </div>`;
+  if(r.length){
+    html+=`<div class="card"><div class="match-teams" style="font-size:16px;margin-bottom:8px">Your results so far</div>`;
+    r.slice().reverse().forEach(f=>{ const cls=f.score>=80?'good':f.score>=50?'mid':'bad';
+      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-top:2px solid #0001">
+        <span style="font-weight:700;font-size:14px">${f.a} v ${f.b}</span>
+        <span class="scorepill ${cls}" style="margin:0">${f.score}</span></div>`; });
+    html+=`</div>`;
+  } else {
+    html+=`<div class="card empty">No results entered yet. Predict some matches, then come back once they've been played!</div>`;
+  }
+  document.getElementById("panel").innerHTML=html;
+}
+
+/* ---------- go ---------- */
+load(); render();
+</script>
