@@ -1,0 +1,69 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leo and Xan's Brain Rot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FFF1D6; --ink:#1d1a16; --coral:#FF5B4A; --sun:#FFC42E;
+    --grass:#1B8A57; --peri:#6C7CFF; --line:#1d1a16; --shadow:8px 8px 0 var(--line);
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{background:var(--paper); color:var(--ink);
+    font-family:'Nunito',system-ui,'Trebuchet MS',sans-serif; -webkit-text-size-adjust:100%}
+  body{min-height:100vh; padding:40px 18px 60px;
+    background-image:radial-gradient(var(--line) 1.3px, transparent 1.3px);
+    background-size:28px 28px;}
+  .wrap{max-width:620px; margin:0 auto}
+  .hero{text-align:center; margin-bottom:30px}
+  .hero .kicker{display:inline-block; font-family:'Fredoka'; font-weight:600; font-size:13px;
+    letter-spacing:2px; text-transform:uppercase; background:var(--ink); color:var(--sun);
+    padding:5px 14px; border-radius:20px; transform:rotate(-2deg)}
+  .hero h1{font-family:'Fredoka'; font-weight:700; font-size:clamp(38px,11vw,62px); line-height:.95;
+    letter-spacing:-2px; margin:14px 0 8px}
+  .hero p{font-size:15px; font-weight:700; opacity:.65; max-width:360px; margin:0 auto}
+  .games{display:grid; gap:18px}
+  .game{display:block; text-decoration:none; color:var(--ink); border:4px solid var(--line);
+    border-radius:24px; box-shadow:var(--shadow); padding:22px 20px; background:#fff;
+    transition:transform .1s ease, box-shadow .1s ease; position:relative; overflow:hidden}
+  .game:hover{transform:translate(-3px,-3px); box-shadow:11px 11px 0 var(--line)}
+  .game:active{transform:translate(4px,4px); box-shadow:3px 3px 0 var(--line)}
+  .game .emoji{font-size:44px; line-height:1}
+  .game h2{font-family:'Fredoka'; font-weight:700; font-size:30px; letter-spacing:-1px; margin:6px 0 2px}
+  .game .tag{font-family:'Fredoka'; font-weight:600; font-size:13px; letter-spacing:2px;
+    text-transform:uppercase; opacity:.6}
+  .game p{font-size:14px; line-height:1.4; margin-top:8px; font-weight:600}
+  .game .go{position:absolute; top:22px; right:22px; font-family:'Fredoka'; font-weight:700;
+    font-size:14px; border:3px solid var(--line); border-radius:30px; padding:6px 14px}
+  .ballpark{background:#FFE6C2} .ballpark .go{background:var(--coral); color:#fff}
+  .cup{background:#D6F2E2} .cup .go{background:var(--grass); color:#fff}
+  .footer{text-align:center; margin-top:30px; font-size:13px; font-weight:700; opacity:.5}
+</style>
+
+<div class="wrap">
+  <div class="hero">
+    <span class="kicker">certified brain rot 🧠</span>
+    <h1>Leo &amp; Xan's<br>Brain Rot</h1>
+    <p>Looks like nonsense. Is actually making you cleverer. Don't tell anyone.</p>
+  </div>
+
+  <div class="games">
+    <a class="game ballpark" href="ballpark.html">
+      <span class="go">PLAY →</span>
+      <div class="emoji">🎯</div>
+      <span class="tag">guess big, guess clever</span>
+      <h2>Ballpark</h2>
+      <p>Daft questions nobody knows the answer to. Nail the size, smash giant numbers into tiny guesses, and dare to be sure. Three games in one.</p>
+    </a>
+
+    <a class="game cup" href="worldcup.html">
+      <span class="go">PLAY →</span>
+      <div class="emoji">⚽</div>
+      <span class="tag">world cup 2026 oracle</span>
+      <h2>Cup Caller</h2>
+      <p>Predict the real World Cup as it happens. Spread your stars, lock it in, and build a track record that proves how good a forecaster you really are.</p>
+    </a>
+  </div>
+
+  <div class="footer">no ads · no logins · just the good stuff 🔥</div>
+</div>
