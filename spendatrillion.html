@@ -1,0 +1,183 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SPEND A TRILLION</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#E9FBEF; --ink:#0f2417; --money:#0E8A4F; --money2:#0a6e3e; --gold:#E6B422;
+    --sun:#FFC42E; --coral:#FF5B4A; --line:#0f2417; --shadow:6px 6px 0 var(--line);
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{background:var(--paper); color:var(--ink);
+    font-family:'Nunito',system-ui,'Trebuchet MS',sans-serif;}
+  body{min-height:100vh; padding-bottom:50px;
+    background-image:radial-gradient(var(--line) 1.1px, transparent 1.1px); background-size:30px 30px;}
+  .wrap{max-width:680px; margin:0 auto; padding:0 16px}
+  h1,h2,h3{font-family:'Fredoka',system-ui,sans-serif}
+  .bank{position:sticky; top:0; z-index:5; background:var(--money); color:#fff;
+    border:3px solid var(--line); border-radius:0 0 20px 20px; box-shadow:var(--shadow);
+    padding:14px 16px; margin-bottom:18px; text-align:center}
+  .bank .ttl{font-family:'Fredoka'; font-weight:600; font-size:12px; letter-spacing:2px; text-transform:uppercase; opacity:.85}
+  .bank .amount{font-family:'Fredoka'; font-weight:700; font-size:clamp(28px,8vw,44px); line-height:1; letter-spacing:-1px; word-break:break-all}
+  .bank .sub{font-size:12px; font-weight:700; opacity:.85; margin-top:3px}
+  .pbar{height:12px; border:2px solid #fff7; border-radius:8px; background:#0006; overflow:hidden; margin-top:8px}
+  .pfill{height:100%; width:0%; background:var(--gold); transition:width .5s ease}
+  .head{text-align:center; padding:18px 0 6px}
+  .head h1{font-weight:700; font-size:34px; letter-spacing:-1.5px; line-height:.9}
+  .head h1 small{display:block; font-size:11px; font-weight:600; letter-spacing:3px; color:var(--money2); text-transform:uppercase; margin-top:4px}
+  .head p{font-size:14px; font-weight:700; opacity:.7; margin-top:8px}
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px}
+  @media(max-width:520px){.grid{grid-template-columns:1fr}}
+  .item{background:#fff; border:3px solid var(--line); border-radius:16px; box-shadow:4px 4px 0 var(--line); padding:12px; display:flex; flex-direction:column}
+  .item .emoji{font-size:30px; line-height:1}
+  .item .name{font-family:'Fredoka'; font-weight:600; font-size:15px; margin:4px 0 1px; line-height:1.15}
+  .item .price{font-weight:700; font-size:13px; opacity:.7}
+  .ctrl{display:flex; align-items:center; gap:8px; margin-top:10px}
+  .ctrl button{width:36px; height:36px; border:3px solid var(--line); border-radius:10px; cursor:pointer;
+    font-family:'Fredoka'; font-weight:700; font-size:20px; line-height:1; box-shadow:2px 2px 0 var(--line)}
+  .ctrl .buy{background:var(--money); color:#fff} .ctrl .sell{background:#fff}
+  .ctrl button:active{transform:translate(1px,1px); box-shadow:1px 1px 0 var(--line)}
+  .ctrl button[disabled]{opacity:.3; cursor:not-allowed; transform:none; box-shadow:2px 2px 0 var(--line)}
+  .owned{flex:1; text-align:center; font-family:'Fredoka'; font-weight:700; font-size:15px}
+  .owned small{display:block; font-size:11px; font-weight:700; opacity:.55; font-family:'Nunito'}
+  .actions{display:flex; gap:10px; margin:18px 0}
+  .btn{flex:1; cursor:pointer; font-family:'Fredoka'; font-weight:600; font-size:16px; color:#fff;
+    background:var(--money); border:3px solid var(--line); border-radius:14px; padding:12px; box-shadow:var(--shadow);
+    transition:transform .08s}
+  .btn:active{transform:translate(2px,2px); box-shadow:2px 2px 0 var(--line)}
+  .btn.ghost{background:#fff; color:var(--ink)}
+  .receipt{background:#fff; border:3px solid var(--line); border-radius:18px; box-shadow:var(--shadow); padding:18px; margin-bottom:18px}
+  .receipt h2{font-size:22px; margin-bottom:4px}
+  .rline{display:flex; justify-content:space-between; padding:6px 0; border-top:2px dashed #0002; font-weight:700; font-size:14px}
+  .rtot{display:flex; justify-content:space-between; padding-top:10px; margin-top:6px; border-top:3px solid var(--line); font-family:'Fredoka'; font-weight:700; font-size:18px}
+  .verdict{background:var(--sun); border:3px solid var(--line); border-radius:13px; padding:12px; font-weight:700; font-size:14px; line-height:1.45; margin-top:12px}
+  .note{font-size:13px; line-height:1.5; font-weight:700; opacity:.85; margin-top:10px}
+  .hidden{display:none}
+</style>
+
+<div class="bank">
+  <div class="ttl">money left to blow</div>
+  <div class="amount" id="bal">£1,000,000,000,000</div>
+  <div class="sub" id="sub">spent £0 · of £1 trillion</div>
+  <div class="pbar"><div class="pfill" id="pfill"></div></div>
+</div>
+
+<div class="wrap">
+  <div class="head">
+    <h1>SPEND A TRILLION<small>£1,000,000,000,000 · go on then</small></h1>
+    <p>Someone's handed you a trillion pounds. Buy whatever you like. Try to spend it ALL — you might be surprised how hard that is.</p>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="actions">
+    <button class="btn ghost" onclick="reset()">↺ Start again</button>
+    <button class="btn" onclick="toggleReceipt()">🧾 My receipt</button>
+  </div>
+
+  <div id="receiptBox"></div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const START=1000000000000; // one trillion
+let bal=START, shownBal=START, showReceipt=false;
+
+const ITEMS=[
+  {e:'🍫',n:'Freddo chocolate bar',p:0.25},
+  {e:'🎟️',n:'Cinema ticket',p:12},
+  {e:'🎮',n:'New video game',p:60},
+  {e:'👟',n:'Fancy trainers',p:150},
+  {e:'📱',n:'Latest phone',p:1000},
+  {e:'🚲',n:'Top racing bike',p:5000},
+  {e:'🏖️',n:'Big family holiday',p:8000},
+  {e:'🚗',n:'A nice car',p:30000},
+  {e:'🔋',n:'Electric sports car',p:90000},
+  {e:'🪙',n:'A bar of gold',p:750000},
+  {e:'🏠',n:'A house in London',p:800000},
+  {e:'🏎️',n:'A Ferrari',p:300000},
+  {e:'🏝️',n:'Your own small island',p:5000000},
+  {e:'✈️',n:'A private jet',p:50000000},
+  {e:'⚽',n:'A superstar footballer',p:180000000},
+  {e:'🛥️',n:'A giant superyacht',p:400000000},
+  {e:'🏥',n:'Run the NHS for ONE DAY',p:520000000},
+  {e:'🏙️',n:'A whole skyscraper',p:1000000000},
+  {e:'🏟️',n:'A Premier League club',p:2500000000},
+  {e:'🚢',n:'An aircraft carrier',p:3000000000},
+  {e:'🚀',n:'Launch a space rocket',p:1500000000},
+  {e:'🏅',n:'Host the Olympic Games',p:10000000000},
+  {e:'⚡',n:'Build a nuclear power station',p:35000000000},
+  {e:'🚄',n:'Build the HS2 railway',p:100000000000},
+  {e:'🌙',n:'A trip to the Moon',p:200000000000},
+  {e:'🏥',n:'Run the NHS for a WHOLE YEAR',p:190000000000},
+].map((x,i)=>({...x,id:i,owned:0}));
+
+function money(p){
+  if(p>=1e12) return '£'+(p/1e12).toFixed(p%1e12?1:0).replace(/\.0$/,'')+' trillion';
+  if(p>=1e9)  return '£'+(p/1e9 ).toFixed(p%1e9?1:0 ).replace(/\.0$/,'')+' billion';
+  if(p>=1e6)  return '£'+(p/1e6 ).toFixed(p%1e6?1:0 ).replace(/\.0$/,'')+' million';
+  if(p>=1e3)  return '£'+Math.round(p).toLocaleString('en-GB');
+  if(p<1)     return '£'+p.toFixed(2);
+  return '£'+Math.round(p).toLocaleString('en-GB');
+}
+function full(p){ return '£'+Math.round(p).toLocaleString('en-GB'); }
+
+function animateBal(){
+  const target=bal, from=shownBal, start=performance.now(), dur=420;
+  function step(t){ const k=Math.min(1,(t-start)/dur), e=1-Math.pow(1-k,3);
+    const v=from+(target-from)*e; $('#bal').textContent=full(v);
+    if(k<1) requestAnimationFrame(step); else { $('#bal').textContent=full(target); shownBal=target; } }
+  requestAnimationFrame(step);
+}
+function updateBank(){
+  const spent=START-bal;
+  $('#sub').textContent='spent '+money(spent)+' · of £1 trillion';
+  $('#pfill').style.width=(spent/START*100)+'%';
+  animateBal();
+}
+function renderGrid(){
+  $('#grid').innerHTML=ITEMS.map(it=>`
+    <div class="item">
+      <div class="emoji">${it.e}</div>
+      <div class="name">${it.n}</div>
+      <div class="price">${money(it.p)}</div>
+      <div class="ctrl">
+        <button class="sell" onclick="sell(${it.id})" ${it.owned===0?'disabled':''}>−</button>
+        <div class="owned">${it.owned}<small>${it.owned?full(it.owned*it.p):'owned'}</small></div>
+        <button class="buy" onclick="buy(${it.id})" ${bal<it.p?'disabled':''}>+</button>
+      </div>
+    </div>`).join('');
+}
+function buy(id){ const it=ITEMS[id]; if(bal<it.p) return; bal-=it.p; it.owned++; updateBank(); renderGrid(); if(showReceipt) renderReceipt(); }
+function sell(id){ const it=ITEMS[id]; if(it.owned===0) return; it.owned--; bal+=it.p; updateBank(); renderGrid(); if(showReceipt) renderReceipt(); }
+function reset(){ bal=START; ITEMS.forEach(i=>i.owned=0); showReceipt=false; $('#receiptBox').innerHTML=''; updateBank(); renderGrid(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+function toggleReceipt(){ showReceipt=!showReceipt; renderReceipt(); if(showReceipt) $('#receiptBox').scrollIntoView({behavior:'smooth'}); }
+function renderReceipt(){
+  if(!showReceipt){ $('#receiptBox').innerHTML=''; return; }
+  const bought=ITEMS.filter(i=>i.owned>0);
+  const spent=START-bal, pct=spent/START*100;
+  let verdict;
+  if(spent===0) verdict="You haven't spent a penny! Go on, treat yourself.";
+  else if(pct<1) verdict="You've spent "+money(spent)+" — and barely scratched it. That's how mind-bendingly big a trillion is: even loads of cars and mansions don't show up.";
+  else if(pct<50) verdict="A serious shopping spree — but still over half your trillion left. The everyday stuff just can't keep up with a number this big.";
+  else if(bal>1000) verdict="Now you're talking! But notice what's actually eaten the money: the nation-sized things. A Ferrari was a rounding error.";
+  else verdict="🎉 You did it — you spent (almost) a TRILLION pounds! Look at your receipt: it took railways, power stations and years of the NHS to get there. THAT is what a trillion means.";
+
+  const lines = bought.length
+    ? bought.map(i=>`<div class="rline"><span>${i.e} ${i.n} ×${i.owned}</span><span>${full(i.owned*i.p)}</span></div>`).join('')
+    : `<div class="rline" style="opacity:.6"><span>nothing yet…</span><span>£0</span></div>`;
+
+  $('#receiptBox').innerHTML=`<div class="receipt">
+    <h2>🧾 Your receipt</h2>
+    ${lines}
+    <div class="rtot"><span>Total spent</span><span>${full(spent)}</span></div>
+    <div class="rline" style="border:none"><span>Money left</span><span>${full(bal)}</span></div>
+    <div class="verdict">${verdict}</div>
+    <div class="note"><b>The big idea:</b> every pound you spend here is a pound you can't spend on anything else — that's the catch with money (and with time, and attention). It's called <i>opportunity cost</i>. And see how only nation-sized things could dent a trillion? That's why it matters when grown-ups argue about a billion here or a trillion there — the words sound similar, but a trillion is a <i>thousand</i> times bigger than a billion.</div>
+  </div>`;
+}
+
+updateBank(); renderGrid();
+</script>
