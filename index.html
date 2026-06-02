@@ -6,7 +6,7 @@
 <style>
   :root{
     --paper:#FFF1D6; --ink:#1d1a16; --coral:#FF5B4A; --sun:#FFC42E;
-    --grass:#1B8A57; --plum:#6C4BB6; --line:#1d1a16; --shadow:8px 8px 0 var(--line);
+    --grass:#1B8A57; --plum:#6C4BB6; --money:#0E8A4F; --line:#1d1a16; --shadow:8px 8px 0 var(--line);
   }
   *{box-sizing:border-box; margin:0; padding:0}
   html,body{background:var(--paper); color:var(--ink);
@@ -38,6 +38,7 @@
   .ballpark{background:#FFE6C2} .ballpark .go{background:var(--coral); color:#fff}
   .cup{background:#D6F2E2} .cup .go{background:var(--grass); color:#fff}
   .who{background:#E6DEF6} .who .go{background:var(--plum); color:#fff}
+  .trillion{background:#FFF0BF} .trillion .go{background:var(--money); color:#fff}
   .footer{text-align:center; margin-top:30px; font-size:13px; font-weight:700; opacity:.5}
 </style>
 
@@ -71,6 +72,14 @@
       <span class="tag">follow the clues</span>
       <h2>Whodunnit</h2>
       <p>Four suspects, one culprit. Each clue is a witness who's only partly sure — watch your suspicions shift, then crack the case in as few clues as you dare.</p>
+    </a>
+
+    <a class="game trillion" href="spendatrillion.html">
+      <span class="go">PLAY →</span>
+      <div class="emoji">💸</div>
+      <span class="tag">how big is a trillion?</span>
+      <h2>Spend a Trillion</h2>
+      <p>You've got £1,000,000,000,000 to blow. Buy yachts, islands, even a trip to the Moon — and discover why it's weirdly, impossibly hard to spend it all.</p>
     </a>
   </div>
 
