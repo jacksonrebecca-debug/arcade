@@ -1,0 +1,186 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE DOUBLING GAME</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FFEFE6; --ink:#26140c; --blast:#F2541B; --blast2:#c43e12; --sun:#FFC42E;
+    --teal:#1FB89B; --peri:#6C7CFF; --line:#26140c; --shadow:6px 6px 0 var(--line);
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{background:var(--paper); color:var(--ink);
+    font-family:'Nunito',system-ui,'Trebuchet MS',sans-serif;}
+  body{min-height:100vh; padding:18px 16px 60px;
+    background-image:radial-gradient(var(--line) 1.1px, transparent 1.1px); background-size:30px 30px;}
+  .wrap{max-width:680px; margin:0 auto}
+  h1,h2,h3{font-family:'Fredoka',system-ui,sans-serif}
+  header{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px}
+  .logo{font-weight:700; font-size:30px; letter-spacing:-1px; line-height:.9}
+  .logo small{display:block; font-size:11px; font-weight:600; letter-spacing:3px; color:var(--blast2); text-transform:uppercase}
+  .card{background:#fff; border:3px solid var(--line); border-radius:18px; box-shadow:var(--shadow); padding:18px; margin-bottom:14px}
+  .lead{font-size:15px; line-height:1.5; margin-bottom:14px; font-weight:600}
+  .chal{cursor:pointer; display:flex; gap:14px; align-items:center; border:3px solid var(--line); border-radius:16px;
+    padding:14px; background:#fff; box-shadow:var(--shadow); margin-bottom:12px; transition:transform .08s}
+  .chal:hover{transform:translate(-2px,-2px); box-shadow:8px 8px 0 var(--line)}
+  .chal:active{transform:translate(3px,3px); box-shadow:2px 2px 0 var(--line)}
+  .chal .em{font-size:38px}
+  .chal h3{font-size:20px; margin-bottom:2px}
+  .chal p{font-size:13px; font-weight:600; opacity:.7; line-height:1.3}
+  .premise{font-size:15px; line-height:1.5; font-weight:600; margin-bottom:16px}
+  .q{font-family:'Fredoka'; font-weight:600; font-size:20px; line-height:1.2; margin-bottom:14px}
+  .opt{display:block; width:100%; text-align:left; cursor:pointer; font-family:'Nunito'; font-weight:700; font-size:15px;
+    border:3px solid var(--line); border-radius:13px; padding:13px 15px; background:#fff; box-shadow:3px 3px 0 var(--line);
+    margin-bottom:10px; transition:transform .08s}
+  .opt:hover{transform:translate(-2px,-2px); box-shadow:5px 5px 0 var(--line)}
+  .opt:active{transform:translate(2px,2px); box-shadow:1px 1px 0 var(--line)}
+  .step-lbl{font-family:'Fredoka'; font-weight:600; font-size:14px; text-transform:uppercase; letter-spacing:1px; opacity:.6; text-align:center}
+  .big{font-family:'Fredoka'; font-weight:700; font-size:clamp(34px,11vw,58px); line-height:1; letter-spacing:-1px;
+    color:var(--blast); text-align:center; word-break:break-all; margin:6px 0}
+  .compare{text-align:center; font-family:'Fredoka'; font-weight:600; font-size:19px; min-height:46px; margin:8px 0 4px}
+  .compare.flash{animation:pop .45s ease}
+  @keyframes pop{0%{transform:scale(.7); opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+  .btn{cursor:pointer; font-family:'Fredoka'; font-weight:600; font-size:20px; color:#fff;
+    background:var(--blast); border:3px solid var(--line); border-radius:15px; padding:15px; box-shadow:var(--shadow);
+    width:100%; transition:transform .06s; margin-top:8px}
+  .btn:active{transform:translate(2px,2px); box-shadow:2px 2px 0 var(--line)}
+  .btn[disabled]{opacity:.4; cursor:not-allowed}
+  .btn.teal{background:var(--teal)} .btn.ghost{background:#fff; color:var(--ink); font-size:16px}
+  .progress{height:12px; border:2px solid var(--line); border-radius:8px; background:#f3e7df; overflow:hidden; margin:14px 0 4px}
+  .pfill{height:100%; width:0%; background:var(--sun); transition:width .25s ease}
+  .verdict{font-family:'Fredoka'; font-weight:700; font-size:22px; text-align:center; margin-bottom:8px}
+  .note{background:var(--sun); border:3px solid var(--line); border-radius:13px; padding:13px; font-weight:700; font-size:14px; line-height:1.5; margin:12px 0}
+  .backlink{display:inline-block; margin-top:6px; font-weight:900; cursor:pointer; border-bottom:3px solid var(--sun)}
+  .center{text-align:center}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="logo">THE DOUBLING GAME<small>watch small become silly</small></div>
+  </header>
+  <div id="panel"></div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+
+/* ---------- formatters ---------- */
+function num(n){
+  if(n>=1e18) return (n/1e18).toFixed(n/1e18>=10?0:1).replace(/\.0$/,'')+' quintillion';
+  if(n>=1e15) return (n/1e15).toFixed(n/1e15>=10?0:1).replace(/\.0$/,'')+' quadrillion';
+  if(n>=1e12) return (n/1e12).toFixed(n/1e12>=10?0:1).replace(/\.0$/,'')+' trillion';
+  if(n>=1e9)  return (n/1e9 ).toFixed(n/1e9>=10?0:1 ).replace(/\.0$/,'')+' billion';
+  if(n>=1e6)  return (n/1e6 ).toFixed(n/1e6>=10?0:1 ).replace(/\.0$/,'')+' million';
+  return Math.round(n).toLocaleString('en-GB');
+}
+function dist(mm){
+  if(mm<10) return mm.toFixed(mm<1?1:0)+' mm';
+  if(mm<1000) return (mm/10).toFixed(0)+' cm';
+  if(mm<1e6) return (mm/1000).toFixed(mm<1e4?1:0).replace(/\.0$/,'')+' m';
+  const km=mm/1e6;
+  if(km<1e6) return km.toLocaleString('en-GB',{maximumFractionDigits:0})+' km';
+  return num(km)+' km';
+}
+function gbp(p){
+  if(p<1) return Math.round(p*100)+'p';
+  if(p<1e6) return '£'+Math.round(p).toLocaleString('en-GB');
+  return '£'+num(p);
+}
+function pick(list,v){ let out=list[0][1]; for(const [thr,txt] of list){ if(v>=thr) out=txt; } return out; }
+
+/* ---------- challenges ---------- */
+const CH={
+  rice:{ emoji:'🌾', title:'Rice on the Chessboard',
+    blurb:'Put 1 grain on the first square, then double it on every square. 64 squares.',
+    premise:"An old story: a clever inventor asks a king for a 'tiny' reward — 1 grain of rice on the first chessboard square, 2 on the next, 4 on the next, doubling all the way to square 64. The king laughs and agrees. Big mistake.",
+    q:"How much rice ends up on the whole board?",
+    options:[['A few bowlfuls 🍚',false],['Enough to fill a swimming pool',false],['Enough to bury a city',false],['More than the world grows in centuries 🌍',true]],
+    start:1, steps:64, step0:1, word:'Square', btn:'Next square ×2',
+    fmt:v=>num(v)+' grains', cmp:v=>pick(RICE,v),
+    finale:v=>"The whole board holds about <b>18 quintillion</b> grains — more rice than the world grows in <b>centuries</b>. The last square alone has more than the other 63 put together!" },
+  paper:{ emoji:'📄', title:'Fold Paper to the Moon',
+    blurb:'A sheet of paper is 0.1 mm thick. Each fold doubles it. How far can you get?',
+    premise:"A normal sheet of paper is about 0.1 mm thick. Fold it in half and it's twice as thick. Fold again — twice again. You can't really fold paper more than a handful of times, but pretend you could. How many folds to reach the Moon?",
+    q:"How many folds of paper would reach the Moon? 🌙",
+    options:[['Just 42 folds',true],['About 1,000 folds',false],['About a million folds',false],['About a billion folds',false]],
+    start:0.1, steps:42, step0:0, word:'Folds', btn:'Fold it ×2',
+    fmt:v=>dist(v), cmp:v=>pick(PAPER,v),
+    finale:v=>"Just <b>42 folds</b> reaches the Moon — 384,400 km away. Folding feels slow, then suddenly you've blasted past Everest, past space, past everything. (You can't really fold paper that many times — but the maths is completely real.)" },
+  penny:{ emoji:'🪙', title:'The Magic Penny',
+    blurb:'Start with 1p. Double it every day for 30 days. Or take a million now?',
+    premise:"Here's a choice. Option A: someone hands you £1,000,000 right now. Option B: a magic penny — just 1p today — that DOUBLES every single day for 30 days. Most people grab the million. Let's see who's right.",
+    q:"Which is more — the doubling penny, or £1,000,000 now?",
+    options:[['The million, obviously 💷',false],['The doubling penny 🪙',true],['They end up about the same',false]],
+    start:0.01, steps:30, step0:1, word:'Day', btn:'Next day ×2',
+    fmt:v=>gbp(v), cmp:v=>pick(PENNY,v),
+    finale:v=>"The penny becomes <b>£5,368,709</b> by day 30 — it smashes the million. Doubling looks pathetic for ages (you're under a tenner for a week!) then it erupts. Slow, slow, slow… BANG." }
+};
+const RICE=[[1,'one lonely grain 🌾'],[20,'a spoonful 🥄'],[5000,'a bowlful 🍚'],[200000,'a big sack'],[5e7,'a wheelbarrow'],[1e9,'a lorry-load 🚛'],[1e12,'a warehouse full'],[1e15,'enough to bury your school'],[1e16,'enough to bury your town'],[1e18,'enough to cover the whole UK 🇬🇧'],[5e18,'more than the world grows in centuries 🌍']];
+const PAPER=[[0.1,'a single sheet of paper 📄'],[1,'as thick as a fingernail'],[12,'a stack of coins'],[65,'a paperback book 📚'],[1000,'up to your knee'],[2000,'taller than you!'],[6500,'a two-storey house 🏠'],[330000,'taller than the Eiffel Tower 🗼'],[828000,'taller than the tallest building on Earth 🏙️'],[8848000,'taller than Mount Everest! 🏔️'],[1e8,'past the edge of space 🚀'],[4e8,'up at the Space Station 🛰️'],[3.844e11,'all the way to the MOON! 🌙']];
+const PENNY=[[0.01,'one penny 🪙'],[1,'a chocolate bar 🍫'],[10,'a couple of comics'],[60,'a video game 🎮'],[500,'a fancy bike 🚲'],[5000,'a big holiday ✈️'],[25000,'a car 🚗'],[300000,'a house 🏠'],[2000000,'a mansion 🏰'],[5000000,'richer than most lottery winners! 💰']];
+
+/* ---------- engine ---------- */
+let cur=null;
+function home(){
+  cur=null;
+  $('#panel').innerHTML=`<div class="card"><div class="lead">Doubling sounds gentle — just ×2. But do it again and again and the numbers get completely ridiculous, way faster than your brain expects. Pick a challenge and see for yourself.</div></div>
+    ${Object.keys(CH).map(k=>`<div class="chal" onclick="begin('${k}')">
+      <div class="em">${CH[k].emoji}</div><div><h3>${CH[k].title}</h3><p>${CH[k].blurb}</p></div></div>`).join('')}`;
+}
+function begin(k){ cur={cfg:CH[k], step:CH[k].step0, val:CH[k].start, guess:null, prevCmp:null}; askGuess(); }
+function askGuess(){
+  const c=cur.cfg;
+  $('#panel').innerHTML=`<div class="card">
+    <div class="premise">${c.premise}</div>
+    <div class="q">${c.q}</div>
+    ${c.options.map((o,i)=>`<button class="opt" onclick="answer(${i})">${o[0]}</button>`).join('')}
+    <span class="backlink" onclick="home()">← back to challenges</span></div>`;
+}
+function answer(i){ cur.guess=i; runShell(); }
+function runShell(){
+  const c=cur.cfg;
+  $('#panel').innerHTML=`<div class="card center">
+    <div class="step-lbl" id="slbl"></div>
+    <div class="big" id="big">0</div>
+    <div class="compare" id="cmp"></div>
+    <div class="progress"><div class="pfill" id="pf"></div></div>
+    <button class="btn" id="dbl" onclick="doDouble()">${c.btn}</button>
+    <span class="backlink" onclick="home()">← back to challenges</span>
+  </div>`;
+  cur.prevCmp=c.cmp(cur.val);
+  paint(false);
+}
+function paint(animate){
+  const c=cur.cfg;
+  $('#slbl').textContent = c.word==='Folds' ? `${cur.step} ${c.word}` : `${c.word} ${cur.step} of ${c.steps}`;
+  $('#big').textContent = c.fmt(cur.val);
+  const cmp=c.cmp(cur.val);
+  const el=$('#cmp'); el.innerHTML=cmp;
+  if(animate && cmp!==cur.prevCmp){ el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
+  cur.prevCmp=cmp;
+  $('#pf').style.width=(cur.step/c.steps*100)+'%';
+  if(cur.step>=c.steps){ const b=$('#dbl'); b.disabled=true; b.textContent='🤯 …and that\u2019s it!'; setTimeout(finish,700); }
+}
+function doDouble(){
+  const c=cur.cfg; if(cur.step>=c.steps) return;
+  const from=cur.val; cur.val*=2; cur.step++;
+  const big=$('#big'), start=performance.now();
+  (function step(t){ const k=Math.min(1,(t-start)/280), e=1-Math.pow(1-k,3); big.textContent=c.fmt(from+(cur.val-from)*e);
+    if(k<1) requestAnimationFrame(step); else big.textContent=c.fmt(cur.val); })(performance.now());
+  paint(true);
+}
+function finish(){
+  const c=cur.cfg, right=c.options[cur.guess][1];
+  $('#panel').innerHTML=`<div class="card center">
+    <div class="verdict">${right?'🎉 You called it!':'😲 Surprised? Almost everyone is.'}</div>
+    <div class="big" style="font-size:clamp(28px,9vw,46px)">${c.fmt(cur.val)}</div>
+    <div class="compare" style="min-height:0">${c.cmp(cur.val)}</div>
+    <div class="note">${c.finale(cur.val)}</div>
+    <div class="note" style="background:#fff">${right?'Your guess was spot on — you already feel how doubling works.':'You guessed <b>“'+c.options[cur.guess][0]+'”</b>. Don\u2019t feel bad — our brains expect numbers to <i>add up</i> a bit at a time, but doubling <i>multiplies</i>, so it stays tiny then explodes. That\u2019s <b>exponential growth</b>, and it fools nearly everyone.'}</div>
+    <button class="btn teal" onclick="begin(curKey())">Play this one again</button>
+    <button class="btn ghost" onclick="home()" style="margin-top:10px">← try another challenge</button>
+  </div>`;
+}
+function curKey(){ return Object.keys(CH).find(k=>CH[k]===cur.cfg); }
+home();
+</script>
