@@ -1,0 +1,189 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE BIG DIG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#E7ECFF; --ink:#0e1330; --space:#3B4CCA; --space2:#2a37a0; --ore:#FFC42E;
+    --green:#1FB89B; --coral:#FF5B4A; --line:#0e1330; --shadow:6px 6px 0 var(--line);
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{background:var(--paper); color:var(--ink);
+    font-family:'Nunito',system-ui,'Trebuchet MS',sans-serif;}
+  body{min-height:100vh; padding:18px 16px 60px;
+    background-image:radial-gradient(var(--space) 1.1px, transparent 1.1px); background-size:32px 32px;}
+  .wrap{max-width:680px; margin:0 auto}
+  h1,h2,h3{font-family:'Fredoka',system-ui,sans-serif}
+  header{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px}
+  .logo{font-weight:700; font-size:30px; letter-spacing:-1px; line-height:.9}
+  .logo small{display:block; font-size:11px; font-weight:600; letter-spacing:3px; color:var(--space2); text-transform:uppercase}
+  .badge{background:var(--ore); border:3px solid var(--line); border-radius:14px; padding:8px 12px;
+    box-shadow:3px 3px 0 var(--line); font-family:'Fredoka'; font-weight:600; text-align:center; min-width:110px}
+  .badge b{display:block; font-size:20px; line-height:1}
+  .badge span{font-size:9px; letter-spacing:1px; text-transform:uppercase}
+  .card{background:#fff; border:3px solid var(--line); border-radius:18px; box-shadow:var(--shadow); padding:16px; margin-bottom:14px}
+  .scout{background:#0e1330; color:#fff; border-color:#0e1330}
+  .scout .h{font-family:'Fredoka'; font-weight:700; font-size:13px; letter-spacing:2px; text-transform:uppercase; color:var(--ore); margin-bottom:6px}
+  .scout .loc{font-family:'Fredoka'; font-weight:700; font-size:22px; line-height:1.1}
+  .scout .row{display:flex; justify-content:space-between; padding:7px 0; border-top:1px solid #ffffff22; font-weight:700; font-size:14px; margin-top:6px}
+  .scout .row b{font-family:'Fredoka'; font-size:16px}
+  .scout .ore{color:var(--ore)}
+  .scout .tip{font-size:12px; opacity:.7; margin-top:8px; font-weight:700}
+  .shop-h{font-family:'Fredoka'; font-weight:700; font-size:18px; margin-bottom:4px}
+  .gear{display:flex; align-items:center; gap:12px; padding:10px 0; border-top:2px solid #0001}
+  .gear:first-of-type{border-top:none}
+  .gear .em{font-size:30px; width:40px; text-align:center}
+  .gear .g-info{flex:1; min-width:0}
+  .gear .g-name{font-family:'Fredoka'; font-weight:600; font-size:15px; line-height:1.15}
+  .gear .g-sub{font-size:12px; font-weight:700; opacity:.65}
+  .step{display:flex; align-items:center; gap:8px}
+  .step button{width:34px; height:34px; border:3px solid var(--line); border-radius:10px; cursor:pointer;
+    font-family:'Fredoka'; font-weight:700; font-size:20px; line-height:1; box-shadow:2px 2px 0 var(--line); background:var(--space); color:#fff}
+  .step button.minus{background:#fff; color:var(--ink)}
+  .step button:active{transform:translate(1px,1px); box-shadow:1px 1px 0 var(--line)}
+  .step button[disabled]{opacity:.3; cursor:not-allowed}
+  .step .n{font-family:'Fredoka'; font-weight:700; font-size:18px; min-width:26px; text-align:center}
+  .buyship{width:100%; cursor:pointer; font-family:'Fredoka'; font-weight:600; font-size:16px; color:#fff;
+    background:var(--space); border:3px solid var(--line); border-radius:12px; padding:11px; box-shadow:3px 3px 0 var(--line)}
+  .buyship.owned{background:var(--green)}
+  .buyship:active{transform:translate(2px,2px); box-shadow:1px 1px 0 var(--line)}
+  .readout{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:6px 0 4px}
+  .ro{border:3px solid var(--line); border-radius:12px; padding:9px; text-align:center; box-shadow:2px 2px 0 var(--line)}
+  .ro b{display:block; font-family:'Fredoka'; font-size:19px; line-height:1.1}
+  .ro span{font-size:10px; font-weight:700; opacity:.6; text-transform:uppercase; letter-spacing:.5px}
+  .ro.profit b{color:var(--green)} .ro.loss b{color:var(--coral)}
+  .actions{display:flex; gap:10px; margin-top:6px}
+  .btn{flex:1; cursor:pointer; font-family:'Fredoka'; font-weight:600; font-size:17px; color:#fff;
+    background:var(--space); border:3px solid var(--line); border-radius:14px; padding:13px; box-shadow:var(--shadow); transition:transform .07s}
+  .btn:active{transform:translate(2px,2px); box-shadow:2px 2px 0 var(--line)}
+  .btn[disabled]{opacity:.4; cursor:not-allowed; transform:none; box-shadow:var(--shadow)}
+  .btn.ghost{background:#fff; color:var(--ink)} .btn.ore{background:var(--ore); color:var(--ink)}
+  .verdict{font-family:'Fredoka'; font-weight:700; font-size:23px; text-align:center; margin-bottom:8px}
+  .pl{display:flex; justify-content:space-between; padding:6px 0; border-top:2px dashed #0002; font-weight:700; font-size:14px}
+  .pl.tot{border-top:3px solid var(--line); font-family:'Fredoka'; font-size:18px; padding-top:10px; margin-top:4px}
+  .note{background:var(--ore); border:3px solid var(--line); border-radius:13px; padding:12px; font-weight:700; font-size:13px; line-height:1.5; margin-top:12px}
+  .center{text-align:center}
+  .small{font-size:12px; font-weight:700; opacity:.6}
+</style>
+ 
+<div class="wrap">
+  <header>
+    <div class="logo">THE BIG DIG<small>space mining · does it pay?</small></div>
+    <div class="badge"><b id="bal">£50bn</b><span>💰 company</span></div>
+  </header>
+  <div id="panel"></div>
+</div>
+ 
+<script>
+const $ = s => document.querySelector(s);
+const ri = (a,b)=>a+Math.floor(Math.random()*(b-a+1));
+function money(n){ const neg=n<0; n=Math.abs(n); let s;
+  if(n>=1e9) s='£'+(n/1e9).toFixed(n/1e9>=100?0:1).replace(/\.0$/,'')+'bn';
+  else if(n>=1e6) s='£'+Math.round(n/1e6)+'m';
+  else s='£'+Math.round(n).toLocaleString('en-GB');
+  return (neg?'−':'')+s; }
+ 
+const LOCS=['the ice moon Borealis','asteroid KX-19','the dead world Cinder','the rogue planet Wisp',
+  'comet Greyback','the shattered moon Halcyon','asteroid Vesta-9','the desert world Ochre','moonlet Tindr','the deep-belt rock Q-77'];
+ 
+let balance=50e9;
+try{ const b=parseFloat(localStorage.getItem('bigdig_balance')); if(!isNaN(b)) balance=b; }catch(e){}
+function saveBal(){ try{ localStorage.setItem('bigdig_balance',balance); }catch(e){} $('#bal').textContent=money(balance); }
+ 
+const STD={dig:10, cost:4e8}, HVY={dig:50, cost:1.5e9};
+let M=null, plan=null, launched=false;
+ 
+function newMission(){
+  const d=ri(1,20);
+  M={ loc:LOCS[ri(0,LOCS.length-1)]+' '+ri(2,99),
+      dist:d, travel:(1+d)*2e9,
+      V: ri(2,30)*5e9,
+      S: ri(4,12)*10 };
+  M.Strue=Math.max(10, Math.round(M.S*(0.85+Math.random()*0.3)));
+  plan={ship:false, std:0, hvy:0}; launched=false;
+  render();
+}
+function calc(){
+  const spent=(plan.ship?M.travel:0)+plan.std*STD.cost+plan.hvy*HVY.cost;
+  const dig=plan.std*STD.dig+plan.hvy*HVY.dig;
+  const fracEst=plan.ship?Math.min(1,dig/M.S):0;
+  return {spent,dig,fracEst,revEst:fracEst*M.V,profEst:plan.ship?fracEst*M.V-spent:0};
+}
+function render(){
+  const c=calc(), canAfford=c.spent<=balance, profPos=c.profEst>=0;
+  $('#panel').innerHTML=`
+    <div class="card scout">
+      <div class="h">📡 Scout report</div>
+      <div class="loc">${M.loc}</div>
+      <div class="row"><span>Stellarite deposit worth</span><b class="ore">${money(M.V)}</b></div>
+      <div class="row"><span>Distance to travel</span><b>${M.dist} light-years</b></div>
+      <div class="row"><span>Dig-power needed (rough)</span><b>about ${M.S}</b></div>
+      <div class="tip">Scouts are guessing on the dig-power — the rock could be a bit bigger or smaller than they think.</div>
+    </div>
+ 
+    <div class="card">
+      <div class="shop-h">🛠️ Plan your expedition</div>
+      <div class="small" style="margin-bottom:8px">First buy the trip out there. Then add drills to dig out the Stellarite.</div>
+ 
+      <button class="buyship ${plan.ship?'owned':''}" onclick="toggleShip()">
+        ${plan.ship?'✓ Expedition booked':'🚀 Book the expedition'} — ${money(M.travel)}</button>
+ 
+      <div class="gear" style="margin-top:12px">
+        <div class="em">⛏️</div>
+        <div class="g-info"><div class="g-name">Standard Drill</div><div class="g-sub">+${STD.dig} dig-power · ${money(STD.cost)} each</div></div>
+        <div class="step"><button class="minus" onclick="bump('std',-1)" ${plan.std===0?'disabled':''}>−</button>
+          <div class="n">${plan.std}</div><button onclick="bump('std',1)">+</button></div>
+      </div>
+      <div class="gear">
+        <div class="em">🚜</div>
+        <div class="g-info"><div class="g-name">Heavy Rig</div><div class="g-sub">+${HVY.dig} dig-power · ${money(HVY.cost)} each (better value)</div></div>
+        <div class="step"><button class="minus" onclick="bump('hvy',-1)" ${plan.hvy===0?'disabled':''}>−</button>
+          <div class="n">${plan.hvy}</div><button onclick="bump('hvy',1)">+</button></div>
+      </div>
+    </div>
+ 
+    <div class="card">
+      <div class="readout">
+        <div class="ro"><b>${money(c.spent)}</b><span>total cost</span></div>
+        <div class="ro"><b>${c.dig} / ${M.S}</b><span>dig-power</span></div>
+        <div class="ro"><b>${plan.ship?money(c.revEst):'—'}</b><span>projected take</span></div>
+        <div class="ro ${profPos?'profit':'loss'}"><b>${plan.ship?money(c.profEst):'—'}</b><span>projected profit</span></div>
+      </div>
+      ${!canAfford?`<div class="small" style="color:var(--coral);text-align:center;margin:6px 0">Your company can't afford that — ${money(c.spent)} is more than you have.</div>`:''}
+      <div class="actions">
+        <button class="btn ghost" onclick="newMission()">Skip mission ↻</button>
+        <button class="btn ore" onclick="launch()" ${(!plan.ship||!canAfford)?'disabled':''}>🚀 LAUNCH</button>
+      </div>
+      <div class="small center" style="margin-top:8px">No deposit is worth chasing if the trip costs more than the haul. Skipping is free.</div>
+    </div>`;
+}
+function toggleShip(){ plan.ship=!plan.ship; render(); }
+function bump(k,d){ plan[k]=Math.max(0,plan[k]+d); render(); }
+ 
+function launch(){
+  const c=calc(); if(!plan.ship||c.spent>balance) return;
+  const frac=Math.min(1,c.dig/M.Strue), rev=frac*M.V, profit=rev-c.spent;
+  balance+=profit; saveBal();
+  let head, why;
+  if(profit>0.4*M.V){ head='💰 Huge haul!'; why='A brilliant operation — the Stellarite was worth far more than it cost to grab.'; }
+  else if(profit>0){ head='✅ You made a profit!'; why='In the black — but check the margins. Costs ate a fair chunk of the haul.'; }
+  else { head='📉 You made a loss.'; why='The journey and the gear cost more than the Stellarite you brought home. Sometimes the smart move is to skip a mission, not chase it.'; }
+  let extra='';
+  if(c.dig>M.Strue*1.4) extra=' You also packed way more drills than the rock needed — that\u2019s money wasted on kit that sat idle.';
+  else if(frac<0.6) extra=' And you left most of the deposit in the ground — too few drills to dig it all out.';
+  $('#panel').innerHTML=`<div class="card center">
+    <div class="verdict">${head}</div>
+    <div class="pl"><span>Stellarite sold (${Math.round(frac*100)}% of the deposit)</span><span>${money(rev)}</span></div>
+    <div class="pl"><span>Expedition + gear</span><span>−${money(c.spent)}</span></div>
+    <div class="pl tot"><span>Profit</span><span style="color:${profit>=0?'var(--green)':'var(--coral)'}">${money(profit)}</span></div>
+    <div class="pl" style="border:none"><span>Company balance now</span><span>${money(balance)}</span></div>
+    <div class="note"><b>The big idea:</b> ${why}${extra} This is what grown-ups call <i>return on investment</i> — you only really win if what you bring back beats everything you spent to get it. A £150bn rock is worthless if it costs £160bn to reach.</div>
+    <button class="btn ore" onclick="newMission()">Next mission →</button>
+    <div class="small" style="margin-top:12px"><span onclick="resetCo()" style="cursor:pointer;border-bottom:2px solid var(--ore)">reset company to £50bn</span></div>
+  </div>`;
+}
+function resetCo(){ balance=50e9; saveBal(); newMission(); }
+ 
+saveBal(); newMission();
+</script>
