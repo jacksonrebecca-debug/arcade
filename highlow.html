@@ -1,0 +1,166 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HIGH OR LOW</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#E4F4FB; --ink:#0c2233; --sky:#1E9BD7; --sky2:#147bb0; --deep:#0c2233;
+    --sun:#FFC42E; --green:#1FB89B; --coral:#FF5B4A; --line:#0c2233; --shadow:6px 6px 0 var(--line);
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{background:var(--paper); color:var(--ink);
+    font-family:'Nunito',system-ui,'Trebuchet MS',sans-serif;}
+  body{min-height:100vh; padding:18px 16px 60px}
+  .wrap{max-width:640px; margin:0 auto}
+  h1,h2,h3{font-family:'Fredoka',system-ui,sans-serif}
+  header{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px}
+  .logo{font-weight:700; font-size:30px; letter-spacing:-1px; line-height:.9}
+  .logo small{display:block; font-size:11px; font-weight:600; letter-spacing:2px; color:var(--sky2); text-transform:uppercase}
+  .scores{display:flex; gap:8px}
+  .badge{background:var(--sun); border:3px solid var(--line); border-radius:13px; padding:7px 11px;
+    box-shadow:3px 3px 0 var(--line); font-family:'Fredoka'; font-weight:600; text-align:center; min-width:64px}
+  .badge.best{background:#fff}
+  .badge b{display:block; font-size:20px; line-height:1}
+  .badge span{font-size:9px; letter-spacing:1px; text-transform:uppercase}
+  .game{display:flex; gap:14px}
+  .ruler{position:relative; width:62px; flex:none; height:380px; border:3px solid var(--line); border-radius:16px;
+    background:linear-gradient(to top,#0c2233 0%,#15507a 22%,#1E9BD7 42%,#bfe7fa 56%,#dff3ff 60%,#7fb6e6 74%,#27407a 88%,#0a0a1a 100%); box-shadow:var(--shadow); overflow:hidden}
+  .ruler .cap{position:absolute; left:0; right:0; text-align:center; font-size:16px}
+  .ruler .cap.top{top:4px} .ruler .cap.bot{bottom:4px}
+  .peg{position:absolute; left:50%; transform:translate(-50%,50%); width:38px; height:38px; border-radius:50%;
+    background:#fff; border:3px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:20px; box-shadow:2px 2px 0 var(--line); transition:bottom .6s cubic-bezier(.2,.8,.2,1)}
+  .peg.q{background:var(--sun)} .peg.ok{background:var(--green)} .peg.no{background:var(--coral)}
+  .content{flex:1; min-width:0; display:flex; flex-direction:column; gap:12px}
+  .panel{border:3px solid var(--line); border-radius:16px; box-shadow:var(--shadow); padding:14px; text-align:center; background:#fff}
+  .panel .em{font-size:38px; line-height:1}
+  .panel .nm{font-family:'Fredoka'; font-weight:600; font-size:17px; line-height:1.15; margin:4px 0}
+  .panel .ht{font-family:'Fredoka'; font-weight:700; font-size:22px; color:var(--sky2); min-height:26px}
+  .panel.known{background:#EAF6FE}
+  .qmark{font-family:'Fredoka'; font-weight:700; font-size:22px; opacity:.4}
+  .ask{font-family:'Fredoka'; font-weight:600; font-size:14px; text-align:center; opacity:.7}
+  .btns{display:flex; flex-direction:column; gap:10px}
+  .btn{cursor:pointer; font-family:'Fredoka'; font-weight:600; font-size:20px; color:#fff;
+    background:var(--sky); border:3px solid var(--line); border-radius:14px; padding:14px; box-shadow:var(--shadow); transition:transform .07s}
+  .btn:active{transform:translate(2px,2px); box-shadow:2px 2px 0 var(--line)}
+  .btn.low{background:var(--deep)}
+  .verdict{font-family:'Fredoka'; font-weight:700; font-size:18px; text-align:center; min-height:24px}
+  .verdict.ok{color:var(--green)} .verdict.no{color:var(--coral)}
+  .over{text-align:center; padding:6px}
+  .over .big{font-family:'Fredoka'; font-weight:700; font-size:54px; line-height:1; color:var(--sky2)}
+  .note{background:var(--sun); border:3px solid var(--line); border-radius:13px; padding:12px; font-weight:700; font-size:13px; line-height:1.5; margin:14px 0}
+  .small{font-size:12px; font-weight:700; opacity:.6}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="logo">HIGH OR LOW<small>deep sea ⟶ the Moon</small></div>
+    <div class="scores">
+      <div class="badge"><b id="streak">0</b><span>🔥 streak</span></div>
+      <div class="badge best"><b id="best">0</b><span>🏆 best</span></div>
+    </div>
+  </header>
+  <div id="panel"></div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const ITEMS=[
+  {e:'🌙',n:'A Moon base',h:384400000},
+  {e:'🛰️',n:'A weather satellite',h:35786000},
+  {e:'📡',n:'A GPS satellite',h:20200000},
+  {e:'🔭',n:'The Hubble Telescope',h:540000},
+  {e:'🚀',n:'The Space Station',h:400000},
+  {e:'🌌',n:'The edge of space',h:100000},
+  {e:'☄️',n:'A shooting star burning up',h:80000},
+  {e:'🎈',n:'A high weather balloon',h:35000},
+  {e:'✈️',n:'A passenger jet cruising',h:11000},
+  {e:'🏔️',n:'The top of Mount Everest',h:8849},
+  {e:'🪂',n:'A skydiver jumping out',h:4000},
+  {e:'⛰️',n:'The top of Ben Nevis',h:1345},
+  {e:'🏙️',n:'The Burj Khalifa (tallest building)',h:828},
+  {e:'🗼',n:'The top of the Eiffel Tower',h:330},
+  {e:'🏢',n:'The top of the Shard',h:310},
+  {e:'🕰️',n:'The top of Big Ben',h:96},
+  {e:'🦒',n:"A giraffe's head",h:5},
+  {e:'🏖️',n:'The beach',h:0},
+  {e:'🤿',n:'A scuba diver',h:-30},
+  {e:'🚇',n:'The deepest Tube station',h:-58},
+  {e:'🧂',n:'The shore of the Dead Sea',h:-430},
+  {e:'🐋',n:'A deep-diving whale',h:-3000},
+  {e:'🚢',n:'The Titanic wreck',h:-3800},
+  {e:'⛏️',n:'The deepest mine on Earth',h:-4000},
+  {e:'🦑',n:'The bottom of the Mariana Trench',h:-10935},
+];
+function hlabel(h){ if(h===0) return 'right at sea level';
+  const a=Math.abs(h); const core = a<10000 ? a.toLocaleString('en-GB')+' m' : (a/1000).toLocaleString('en-GB')+' km';
+  return core+' '+(h>0?'above sea level':'below sea level'); }
+function L(v){ return Math.sign(v)*Math.log10(1+Math.abs(v)); }
+const LO=L(-10935), HI=L(384400000);
+function pos(h){ let p=(L(h)-LO)/(HI-LO); return Math.max(.04,Math.min(.96,p)); }
+
+let streak=0, best=0;
+try{ best=parseInt(localStorage.getItem('highlow_best'))||0; }catch(e){}
+function saveBest(){ try{ localStorage.setItem('highlow_best',best); }catch(e){} }
+
+let cur=null, nxt=null, phase='guess';
+const rand=()=>ITEMS[Math.floor(Math.random()*ITEMS.length)];
+function draw(not){ let x; do{ x=rand(); }while(x.h===not.h); return x; }
+function start(){ cur=rand(); nxt=draw(cur); streak=0; phase='guess'; render(); }
+
+function render(){
+  $('#streak').textContent=streak; $('#best').textContent=best;
+  if(phase==='over'){ renderOver(); return; }
+  const revealing = phase==='reveal';
+  const correct = revealing ? guessCorrect : null;
+  $('#panel').innerHTML=`
+    <div class="game">
+      <div class="ruler">
+        <div class="cap top">🌙</div><div class="cap bot">🌊</div>
+        <div class="peg" style="bottom:${pos(cur.h)*100}%">${cur.e}</div>
+        ${revealing?`<div class="peg ${correct?'ok':'no'}" style="bottom:${pos(nxt.h)*100}%">${nxt.e}</div>`:''}
+      </div>
+      <div class="content">
+        <div class="panel">
+          <div class="em">${nxt.e}</div>
+          <div class="nm">${nxt.n}</div>
+          <div class="ht">${revealing?hlabel(nxt.h):'<span class="qmark">??? </span>'}</div>
+        </div>
+        ${revealing
+          ? `<div class="verdict ${correct?'ok':'no'}">${correct?'✓ Correct!':'✗ Not quite'}</div>`
+          : `<div class="ask">…higher or lower than…</div>
+             <div class="btns">
+               <button class="btn" onclick="guess('higher')">⬆️ HIGHER</button>
+               <button class="btn low" onclick="guess('lower')">⬇️ LOWER</button>
+             </div>`}
+        <div class="panel known">
+          <div class="em">${cur.e}</div>
+          <div class="nm">${cur.n}</div>
+          <div class="ht">${hlabel(cur.h)}</div>
+        </div>
+      </div>
+    </div>`;
+}
+let guessCorrect=false;
+function guess(dir){
+  if(phase!=='guess') return;
+  guessCorrect = (dir==='higher' && nxt.h>cur.h) || (dir==='lower' && nxt.h<cur.h);
+  phase='reveal'; render();
+  if(guessCorrect){
+    streak++; if(streak>best){ best=streak; saveBest(); }
+    setTimeout(()=>{ cur=nxt; nxt=draw(cur); phase='guess'; render(); }, 1300);
+  } else {
+    setTimeout(()=>{ phase='over'; render(); }, 1500);
+  }
+}
+function renderOver(){
+  $('#panel').innerHTML=`<div class="panel over">
+    <div class="small">your streak</div>
+    <div class="big">${streak}</div>
+    <div class="small">best ever: ${best}</div>
+    <div class="note">Everything sits somewhere on one giant ruler — from the Mariana Trench nearly 11 km <i>down</i>, to a Moon base 384,400 km <i>up</i>. The trick is getting a feel for the in-between: a jet flies higher than Everest, but the Space Station is 35 times higher again. Once you can picture the scale, you can guess almost anything.</div>
+    <button class="btn" onclick="start()">▶️ Play again</button>
+  </div>`;
+}
+start();
+</script>
